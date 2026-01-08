@@ -1,5 +1,7 @@
-import RoomTabs from "@/components/home/RoomTabs";
-
+import MusicPlayer from "@/components/room/MusicPlayer";
+import Roomsidebar from "@/components/room/Roomsidebar";
+import RoomTabs from "@/components/room/Tabs/RoomTabs";
+import TabNav from "@/components/room/Tabs/TabNav";
 import {
   Card,
   CardContent,
@@ -8,37 +10,44 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
-type Props={
-  params: {
-    roomCode: string
-  }
-}
-const page = async ({ params }: Props) => {
-  const { roomCode } = await params; 
-  
-   if (!roomCode || !/^\d{6}$/.test(roomCode)) {
-     return (
-       <div className="flex items-center justify-center min-h-screen bg-background p-4">
-         <Card className="w-full max-w-md">
-           <CardHeader className="text-center pb-2">
-             <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
-             <CardTitle className="text-foreground">
-               Invalid Room Code
-             </CardTitle>
-           </CardHeader>
-           <CardContent className="text-center">
-             <CardDescription className="text-muted-foreground">
-               Room code should be a 6 digit number
-             </CardDescription>
-           </CardContent>
-         </Card>
-       </div>
-     );
-   }
-  
-  return (
-   <RoomTabs/>
-  )
-}
 
-export default page
+type Props = {
+  params: {
+    roomCode: string;
+  };
+};
+
+const page = async ({ params }: Props) => {
+  const { roomCode } = await params;
+
+  if (!roomCode || !/^\d{6}$/.test(roomCode)) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center pb-2">
+            <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+            <CardTitle className="text-foreground">Invalid Room Code</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <CardDescription className="text-muted-foreground">
+              Room code should be a 6 digit number
+            </CardDescription>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <TabNav />
+      <Roomsidebar />
+      <RoomTabs />
+      <div className="fixed bottom-0 left-0 w-full flex justify-center py-5 bg-secondary/20 border-t">
+        <MusicPlayer />
+      </div>
+    </>
+  );
+};
+
+export default page;

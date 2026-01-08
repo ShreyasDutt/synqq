@@ -1,11 +1,11 @@
-import { Minus } from "lucide-react"
-import { Button } from "../ui/button"
+import { Minus } from "lucide-react";
+import { Button } from "../ui/button";
 
 const tracks = [
   { id: 1, title: "Save Your Tears", artist: "The Weeknd", duration: "3:35" },
   { id: 2, title: "Blinding Lights", artist: "The Weeknd", duration: "3:20" },
   { id: 3, title: "Starboy", artist: "The Weeknd", duration: "3:50" },
-]
+];
 
 const Tracks = () => {
   return (
@@ -27,7 +27,9 @@ const Tracks = () => {
           <p className="w-6 text-sm text-neutral-500">{index + 1}</p>
 
           <div className="flex-1 ml-4">
-            <p className="text-sm">{track.artist} – {track.title}</p>
+            <p className="text-sm">
+              {track.artist} – {track.title}
+            </p>
           </div>
 
           <div className="flex items-center gap-3 text-sm">
@@ -39,7 +41,7 @@ const Tracks = () => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default Tracks
+export default Tracks;
