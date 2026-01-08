@@ -10,7 +10,6 @@ import DisplayName from "./DisplayName";
 import CreateRoomButton from "./CreateRoomButton";
 
 const JoinwithCode = () => {
-  
   return (
     <div className="flex items-center justify-center">
       <Card className="w-92 lg:w-106 2xl:w-113 flex">

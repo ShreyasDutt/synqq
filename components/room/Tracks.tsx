@@ -1,8 +1,11 @@
+<<<<<<<< HEAD:components/room/Tabs/MusicTab.tsx
+import { Button } from "@/components/ui/button"
+import { Minus } from "lucide-react"
 
-import { Button } from "@/components/ui/button";
+========
 import { Minus } from "lucide-react";
-
-
+import { Button } from "../ui/button";
+>>>>>>>> dc69fed6c6c8bb9d60892eb867380ed2503f86fc:components/room/Tracks.tsx
 
 const tracks = [
   { id: 1, title: "Save Your Tears", artist: "The Weeknd", duration: "3:35" },
@@ -46,6 +49,7 @@ const MusicTab = () => {
         </div>
       ))}
     </div>
+<<<<<<<< HEAD:components/room/Tabs/MusicTab.tsx
     
 
     </>
@@ -53,4 +57,9 @@ const MusicTab = () => {
 }
 
 export default MusicTab
+========
+  );
+};
 
+export default Tracks;
+>>>>>>>> dc69fed6c6c8bb9d60892eb867380ed2503f86fc:components/room/Tracks.tsx
