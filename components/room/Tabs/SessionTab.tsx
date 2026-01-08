@@ -29,7 +29,7 @@ const SessionTab = () => {
   return (
     <div>
       {/* Session Nav */}
-      <div className='flex items-center justify-between px-4 py-3'>
+      <div className='flex items-center justify-between px-4 py-3 lg:bg-neutral-900'>
         <p># Room 403360</p>
         <Button variant='ghost' className='text-neutral-400'>
           <QrCode /> QR
@@ -39,13 +39,13 @@ const SessionTab = () => {
       <Separator />
 
       {/* Playback Permissions */}
-      <div className='px-4 py-4 flex flex-col gap-3'>
+      <div className='px-4 py-4 flex flex-col gap-3 lg:bg-neutral-900'>
         <div className='flex items-center gap-2 text-sm text-neutral-400 uppercase'>
           <Play size={15} />
           <p>Playback permissions</p>
         </div>
 
-        <ButtonGroup className='w-full flex'>
+        <ButtonGroup className='w-full flex lg:bg-neutral-900'>
           <Button className='flex-1' variant='outline'>
             <Users />
             Everyone
@@ -60,7 +60,7 @@ const SessionTab = () => {
       <Separator />
 
       {/* Global Volume */}
-      <div className='px-4 py-4 flex flex-col gap-3'>
+      <div className='px-4 py-4 flex flex-col gap-3 lg:bg-neutral-900'>
         <div className='flex items-center gap-2 text-sm text-neutral-400 uppercase'>
           <Volume2 size={15} />
           <p>Global Volume</p>
@@ -74,7 +74,7 @@ const SessionTab = () => {
       <Separator />
 
       {/* Connected Users */}
-      <div className='px-4 py-4 flex flex-col gap-4'>
+      <div className='px-4 py-4 flex flex-col gap-4 lg:bg-neutral-900'>
         {/* Header */}
         <div className='flex items-center justify-between text-sm text-neutral-400'>
           <div className='flex items-center gap-2'>

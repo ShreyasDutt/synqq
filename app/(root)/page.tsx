@@ -1,5 +1,5 @@
 import JoinwithCode from "@/components/home/JoinwithCode"
-import PlayingNow from "@/components/home/PlayingNow"
+import PlayingNow from "@/components/room/PlayingNow"
 
 const Page = () => {
   return (

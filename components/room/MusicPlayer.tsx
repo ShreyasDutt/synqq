@@ -4,7 +4,7 @@ import { Progress } from "../ui/progress"
 const MusicPlayer = () => {
   return (
 
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 ">
     <div className="flex items-center justify-center gap-6">
         <Shuffle className="text-neutral-400" size={17}/>
         <SkipBack className="fill-neutral-300 text-neutral-300"/>

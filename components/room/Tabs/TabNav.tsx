@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 const TabNav = () => {
   return (
-            <div className="flex items-center justify-between px-4 py-2 md:py-0 text-xs text-neutral-400">
+            <div className="flex items-center justify-between px-4 py-2 md:py-2 text-xs text-neutral-400 lg:border-b ">
             <div className="flex items-center gap-5">
               <div className="flex items-center gap-1 font-medium text-neutral-300">
                 <Music size={14} className="text-primary" />

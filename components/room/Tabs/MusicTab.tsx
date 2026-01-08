@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button"
 import { Minus } from "lucide-react"
-import { Button } from "../ui/button"
+
 
 const tracks = [
   { id: 1, title: "Save Your Tears", artist: "The Weeknd", duration: "3:35" },
@@ -7,8 +8,10 @@ const tracks = [
   { id: 3, title: "Starboy", artist: "The Weeknd", duration: "3:50" },
 ]
 
-const Tracks = () => {
+const MusicTab = () => {
   return (
+  <>
+    
     <div className="mt-10 space-y-2">
       {tracks.length === 0 && (
         <div className="flex flex-col gap-3 items-center justify-center">
@@ -39,7 +42,10 @@ const Tracks = () => {
         </div>
       ))}
     </div>
+    
+
+    </>
   )
 }
 
-export default Tracks
+export default MusicTab
