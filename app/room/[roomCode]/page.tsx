@@ -45,7 +45,7 @@ const page = async ({ params }: Props) => {
       <div className="flex-1 overflow-hidden">
         <RoomTabs/>
       </div>
-      <div className="left-0 w-full flex justify-center py-5 bg-secondary/20 border-t">
+      <div className="left-0 w-full flex justify-center lg:py-3 py-5 bg-neutral-900/10 border-t">
         <MusicPlayer />
       </div>
     </div>
