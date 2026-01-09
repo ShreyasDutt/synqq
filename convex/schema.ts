@@ -6,7 +6,7 @@ export default defineSchema({
   participant: defineTable({
     displayName: v.string(),
     roomId: v.string(),
-    role: v.string(), //Host or User
+    role: v.string(), //Admin or User
     joinedAt: v.number()
   }).index("byDisplayName", ["displayName"]). index("byRoomId", ["roomId"]). index("byDisplayNameAndRoomId", ["displayName","roomId"]),
 

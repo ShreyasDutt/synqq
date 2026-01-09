@@ -8,8 +8,10 @@ import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { Card, CardDescription, CardFooter, CardTitle } from "../ui/card";
 import DisplayName from "./DisplayName";
 import CreateRoomButton from "./CreateRoomButton";
+import { useRouter } from "next/navigation";
 
 const JoinwithCode = () => {
+  const router = useRouter();
   return (
     <div className="flex items-center justify-center">
       <Card className="w-92 lg:w-106 2xl:w-113 flex">
@@ -22,7 +24,8 @@ const JoinwithCode = () => {
           <CardDescription>
             Enter a room code to join or create a new room
           </CardDescription>
-          <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS}>
+          <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS}
+            onChange={(v => { if (v.length === 6) router.push(`room/${v}`) })}>
             <InputOTPGroup className="gap-2">
               <InputOTPSlot index={0} />
               <InputOTPSlot index={1} />

@@ -3,32 +3,34 @@ import Link from 'next/link'
 
 const TabNav = () => {
   return (
-            <div className="flex items-center justify-between px-4 py-2 md:py-2 text-xs text-neutral-400 lg:border-b ">
-            <div className="flex items-center gap-5">
-              <div className="flex items-center gap-1 font-medium text-neutral-300">
-                <Music size={14} className="text-primary" />
-                <span>Synq</span>
-              </div>
-              <span>#403360</span>
-              <div className="flex items-center gap-1">
-                <Users size={14} />
-                <span>1 user</span>
-              </div>
-            </div>
+    <div className="flex items-center justify-between px-4 py-2 md:py-2 text-xs text-neutral-400 lg:border-b ">
+      <div className="flex items-center gap-5">
+        <Link href="/">
+          <div className="flex items-center gap-1 font-medium text-neutral-300 hover:text-neutral-400">
+            <Music size={14} className="text-primary" />
+            <span>Synq</span>
+          </div>
+        </Link>
+        <span>#403360</span>
+        <div className="flex items-center gap-1">
+          <Users size={14} />
+          <span>1 user</span>
+        </div>
+      </div>
 
-          <Link href="/" aria-label="GitHub repository">
-            <svg
-              width="25"
-              height="25"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="12" cy="12" r="12" />
-              
-              <path
-                fill="white"
-                d="M12 5.5c-3.59 0-6.5 2.91-6.5 6.5
+      <Link href="/" aria-label="GitHub repository">
+        <svg
+          width="25"
+          height="25"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="12" cy="12" r="12" />
+
+          <path
+            fill="white"
+            d="M12 5.5c-3.59 0-6.5 2.91-6.5 6.5
                 0 2.87 1.86 5.31 4.44 6.17
                 .33.06.45-.14.45-.32v-1.13
                 c-1.81.39-2.19-.87-2.19-.87
@@ -51,12 +53,11 @@ const TabNav = () => {
                 c0 .18.12.39.46.32
                 2.58-.86 4.43-3.3 4.43-6.17
                 0-3.59-2.91-6.5-6.5-6.5z"
-              />
-            </svg>
-          </Link>
-
-        </div>
-  )
+          />
+        </svg>
+      </Link>
+    </div>
+  );
 }
 
 export default TabNav

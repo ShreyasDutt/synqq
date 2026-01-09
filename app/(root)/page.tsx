@@ -1,7 +1,6 @@
 import JoinwithCode from "@/components/home/JoinwithCode"
 import PlayingNow from "@/components/room/PlayingNow";
 
-
 const Page = () => {
   return (
     <div className="flex flex-col items-start justify-center gap-7">
