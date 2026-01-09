@@ -50,8 +50,8 @@ export const getRooms = query({
 
 export const joinRoom = mutation({
   args: {
-    roomCode: v.optional(v.number()),
     displayName: v.string(),
+    roomCode: v.optional(v.number()),
   },
   handler: async (ctx, { roomCode, displayName }) => {
     if (!roomCode) {

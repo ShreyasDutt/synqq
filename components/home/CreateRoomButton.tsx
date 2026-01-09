@@ -3,18 +3,18 @@
 import { PlusCircle } from "lucide-react";
 import { Button } from "../ui/button";
 import { joinRoomAction } from "@/app/actions/room.actions";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { createdRoomAtom, displayNameAtom } from "@/atoms/atoms";
 
 const CreateRoomButton = () => {
     const [displayName] = useAtom(displayNameAtom);
-    const setCreatedRoom = useSetAtom(createdRoomAtom);
+    const [created , setCreatedRoom] = useAtom(createdRoomAtom);
     return (
 
         <Button
             className={"2xl:h-10"}
             onClick={() => {
-                joinRoomAction(displayName);
+                joinRoomAction({displayName});
                 setCreatedRoom(true);
             }}>
           <PlusCircle />
