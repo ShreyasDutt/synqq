@@ -146,3 +146,28 @@ export const getRoomData = query({
     return { room, participants };
   }
 })
+
+// get both room and users
+
+export const getRoomFullData = query({
+  args: {},
+  handler: async (ctx) => {
+    const rooms = await ctx.db.query("room").collect();
+    if (rooms.length === 0) return [];
+
+    const participants = await ctx.db.query("participant").collect();
+
+    const participantsByRoomId = new Map<string, typeof participants>();
+
+    for (const p of participants) {
+      const list = participantsByRoomId.get(p.roomId) ?? [];
+      list.push(p);
+      participantsByRoomId.set(p.roomId, list);
+    }
+
+    return rooms.map((room) => ({
+      room,
+      participants: participantsByRoomId.get(room._id) ?? [],
+    }));
+  },
+});
