@@ -1,4 +1,7 @@
-import RoomClient from "@/components/room/RoomClient";
+import MusicPlayer from "@/components/room/MusicPlayer";
+import RoomTabs from "@/components/room/RoomTabs";
+import TabNav from "@/components/room/Tabs/TabNav";
+import Roomsidebar from "@/components/room/Roomsidebar";
 import {
   Card,
   CardContent,
@@ -6,13 +9,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AlertCircle, Music, Users } from "lucide-react";
 
-type Props = {
+import { AlertCircle } from "lucide-react";
+
+type Props={
   params: {
     roomCode: string
   }
-};
+}
+
 const page = async ({ params }: Props) => {
   const { roomCode } = await params;
 
@@ -30,11 +35,23 @@ const page = async ({ params }: Props) => {
             </CardDescription>
           </CardContent>
         </Card>
+
       </div>
     );
   }
 
-  return <RoomClient paramsRoomCode={roomCode} />;
-};
+  return (
+    <div className="h-screen flex flex-col overflow-hidden">
+      <TabNav/>
+      <Roomsidebar/>
+      <div className="flex-1 overflow-hidden">
+        <RoomTabs/>
+      </div>
+      <div className="left-0 w-full flex justify-center lg:py-3 py-5 bg-neutral-900/10 border-t">
+        <MusicPlayer />
+      </div>
+    </div>
+  )
+}
 
 export default page;
