@@ -1,6 +1,6 @@
 "use client";
 
-import { joinRoomAction, leaveRoomAction } from "@/app/actions/room.actions";
+import { joinRoomAction } from "@/app/actions/room.actions";
 import { createdRoomAtom, displayNameAtom } from "@/atoms/atoms";
 import { generateRandomName } from "@/lib/generateName";
 import { useAtom } from "jotai";
@@ -23,14 +23,9 @@ const JoinRoom = ({ recievedRoomCode }: { recievedRoomCode: string }) => {
       }
     }
   };
-  const leaveRoom = async () => {
-    await leaveRoomAction({ displayName, roomCode });
-  };
+ 
   useEffect(() => {
     joinRoom();
-    return () => {
-      leaveRoom();
-    };
   }, []);
 
   return <></>;
