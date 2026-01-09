@@ -41,13 +41,8 @@ const createRoomInternal = async ({
   });
 };
 
-export const getRooms = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("room").collect();
-  },
-});
 
+//-----mutations----
 export const joinRoom = mutation({
   args: {
     displayName: v.string(),
@@ -88,7 +83,6 @@ export const joinRoom = mutation({
   },
 });
 
-
 export const leaveRoom = mutation({
   args: {
     roomCode: v.number(),
@@ -101,14 +95,23 @@ export const leaveRoom = mutation({
       .unique();
     if (!room) return console.error("Room not found while leaving room");
 
-    const participant = await ctx.db.query('participant').withIndex("byDisplayNameAndRoomId", (q => q.eq("displayName", displayName).eq("roomId", room._id))).unique();
-    if (!participant) return console.error("Participant not found while leaving room");
+    const participant = await ctx.db
+      .query("participant")
+      .withIndex("byDisplayNameAndRoomId", (q) =>
+        q.eq("displayName", displayName).eq("roomId", room._id)
+      )
+      .unique();
+    if (!participant)
+      return console.error("Participant not found while leaving room");
 
     const isAdmin = participant.role === "admin";
-    await ctx.db.delete(participant._id)
+    await ctx.db.delete(participant._id);
 
-    const otherParticipants = await ctx.db.query("participant").withIndex("byRoomId", (q => q.eq('roomId', room._id))).collect();
-    
+    const otherParticipants = await ctx.db
+      .query("participant")
+      .withIndex("byRoomId", (q) => q.eq("roomId", room._id))
+      .collect();
+
     if (otherParticipants.length === 0) {
       await ctx.db.delete(room._id);
       return;
@@ -116,7 +119,30 @@ export const leaveRoom = mutation({
 
     if (isAdmin) {
       const newAdmin = otherParticipants[0];
-      await ctx.db.patch(newAdmin._id, {role: "admin"})
+      await ctx.db.patch(newAdmin._id, { role: "admin" });
     }
+  },
+});
+
+
+//----queries----
+export const getRooms = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("room").collect();
+  },
+});
+
+export const getRoomData = query({
+  args: {
+    roomCode: v.number()
+  },
+  handler: async (ctx, { roomCode }) => {
+    const room = await ctx.db.query("room").withIndex('byRoomCode', (q => q.eq("roomCode", roomCode))).unique();
+    
+    if (!room) return console.error("Error while getting room in the getRoomParticipants query")
+    
+    const participants = await ctx.db.query("participant").withIndex("byRoomId", (q => q.eq("roomId", room._id))).collect();
+    return { room, participants };
   }
 })

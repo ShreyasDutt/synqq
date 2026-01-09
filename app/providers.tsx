@@ -1,12 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { Provider as JotaiProvider } from "jotai";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { ReactNode } from "react";
 
-type Props = {
-  children: ReactNode;
-};
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-export function JotaiRootProvider({ children }: Props) {
-  return <JotaiProvider>{children}</JotaiProvider>;
+export function ConvexClientProvider({ children }: { children: ReactNode }) {
+  return <ConvexProvider client={convex}>{children}</ConvexProvider>;
 }
