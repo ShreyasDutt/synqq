@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
+import { countryCodeToEmoji } from '@/lib/generateName'
 import { useAtom } from 'jotai'
 import { Crown, Play, QrCode, Users, Volume2 } from 'lucide-react'
 
@@ -101,7 +102,9 @@ const SessionTab = () => {
               className="flex items-center justify-between hover:bg-primary/20 py-3 px-2 cursor-pointer transition-colors duration-200 rounded-md"
             >
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 bg-neutral-600 rounded-full" />
+                <div className="w-7 h-7 bg-neutral-600 contain-content rounded-full text-[38px] flex items-center justify-center">
+                  {countryCodeToEmoji(participant.country)}
+                </div>
                 <p className="text-sm">{participant.displayName}</p>
                 {participant.role === "admin" && (
                   <Crown size={14} className="text-yellow-500" />

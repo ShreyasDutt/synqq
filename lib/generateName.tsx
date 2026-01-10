@@ -9,3 +9,12 @@ export function generateRandomName() {
     return (`${adj}${animal}${num}`);
     
 }
+
+export function countryCodeToEmoji(code: string | undefined) {
+  if (!code) return "🏳️"; // fallback
+  return code
+    .toUpperCase()
+    .replace(/./g, (char) =>
+      String.fromCodePoint(127397 + char.charCodeAt(0))
+    );
+}

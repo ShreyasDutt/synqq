@@ -17,8 +17,9 @@ type RoomParticipant = {
   _creationTime: number;
   displayName: string;
   roomId: string;
-    role: string;
+  role: string;
   joinedAt: number | null | undefined;
+  country: string;
 };
 
 type RoomData = {

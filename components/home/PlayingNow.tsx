@@ -7,6 +7,7 @@ import { ChevronRight } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { Card } from "../ui/card";
 import { BlurFade } from "../ui/blur-fade";
+import { countryCodeToEmoji } from "@/lib/generateName";
 
 const PlayingNow = () => {
   const fullRoomData = useQuery(api.room.getRoomFullData);
@@ -39,14 +40,6 @@ if (fullRoomData === undefined) {
   );
 }
 
-function countryCodeToEmoji(code: string | undefined) {
-  if (!code) return "🏳️"; // fallback
-  return code
-    .toUpperCase()
-    .replace(/./g, (char) =>
-      String.fromCodePoint(127397 + char.charCodeAt(0))
-    );
-}
 
 
   return (
@@ -88,18 +81,56 @@ function countryCodeToEmoji(code: string | undefined) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex -space-x-[0.6rem]">
-                    {room.participants.map((participant) => (
-                      <Avatar key={participant._id}>
-                        {/* render country flags */}
-                        <AvatarImage src="" />
-                        <AvatarFallback>
-                          {countryCodeToEmoji(participant.country)}
-                        </AvatarFallback>
-                      </Avatar>
-                    ))}
-                  </div>
+                 <div className="flex -space-x-[0.6rem] items-center">
+                    {(() => {
+                      const maxFlags = 3;
+                      const seenCountries = new Set<string>();
+                      const uniqueParticipants: typeof room.participants = [];
 
+                      // Pick participants with unique countries first
+                      for (const p of room.participants) {
+                        if (!seenCountries.has(p.country)) {
+                          uniqueParticipants.push(p);
+                          seenCountries.add(p.country);
+                        }
+                        if (uniqueParticipants.length === maxFlags) break;
+                      }
+
+                      // Fill with remaining participants if fewer than maxFlags
+                      if (uniqueParticipants.length < maxFlags) {
+                        for (const p of room.participants) {
+                          if (!uniqueParticipants.includes(p)) {
+                            uniqueParticipants.push(p);
+                          }
+                          if (uniqueParticipants.length === maxFlags) break;
+                        }
+                      }
+
+                      const extraCount = room.participants.length - uniqueParticipants.length;
+
+                      return (
+                        <>
+                          {uniqueParticipants.map((participant) => (
+                            <Avatar key={participant._id}>
+                              <AvatarImage
+                                src=""
+                                alt={participant.country}
+                              />
+                              <AvatarFallback>
+                                {countryCodeToEmoji(participant.country)}
+                              </AvatarFallback>
+                            </Avatar>
+                          ))}
+
+                          {extraCount > 0 && (
+                            <Avatar>
+                              <AvatarFallback>+{extraCount}</AvatarFallback>
+                            </Avatar>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
                   <ChevronRight
                     className="text-neutral-400"
                     strokeWidth={1}
