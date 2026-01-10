@@ -3,9 +3,6 @@ import {
   Library,
   ListMusic,
   MessageCircleMore,
-  Play,
-  QrCode,
-  Users,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSetAtom } from "jotai";

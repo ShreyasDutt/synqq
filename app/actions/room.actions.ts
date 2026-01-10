@@ -23,8 +23,14 @@ export const joinRoomAction = async ({displayName, roomCode}: JoinRoom) => {
     const country = h.get("x-vercel-ip-country");
     const region = h.get("x-vercel-ip-country-region");
     const city = h.get("x-vercel-ip-city");
-    console.log(country,region,city,"Location Data")
-    const createdRoomCode = await fetchMutation(api.room.joinRoom, { displayName, roomCode });
+    console.log(country,region,city,'from server')
+    const createdRoomCode = await fetchMutation(api.room.joinRoom, {
+    displayName,
+    roomCode,
+    country: h.get("x-vercel-ip-country") ?? undefined,
+    region: h.get("x-vercel-ip-country-region") ?? undefined,
+    city: h.get("x-vercel-ip-city") ?? undefined,
+  });
     if (!createdRoomCode) return;
     return createdRoomCode;
 };

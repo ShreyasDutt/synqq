@@ -5,6 +5,9 @@ export default defineSchema({
 
   participant: defineTable({
     displayName: v.string(),
+    country:v.string(),
+    region:v.string(),
+    city:v.string(),
     roomId: v.string(),
     role: v.string(), //Admin or User
     joinedAt: v.number()

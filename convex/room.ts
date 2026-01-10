@@ -5,6 +5,9 @@ type createRoomInternal = {
   ctx: MutationCtx;
   roomCode: number;
   displayName: string;
+  country?: string;
+  region?: string;
+  city?: string;
 };
 
 const generateRandomRoomCode = async (ctx: MutationCtx) => {
@@ -24,6 +27,9 @@ const createRoomInternal = async ({
   ctx,
   roomCode,
   displayName,
+  country,
+  region,
+  city,
 }: createRoomInternal) => {
   const roomId = await ctx.db.insert("room", {
     roomCode,
@@ -38,6 +44,9 @@ const createRoomInternal = async ({
     role: "admin",
     joinedAt: Date.now(),
     displayName,
+    country: country || "IN",
+    region: region || "XY",
+    city: city || "Chandigarh",
   });
 };
 
@@ -47,13 +56,18 @@ export const joinRoom = mutation({
   args: {
     displayName: v.string(),
     roomCode: v.optional(v.number()),
+    country: v.optional(v.string()),
+    region: v.optional(v.string()),
+    city: v.optional(v.string()),
   },
-  handler: async (ctx, { roomCode, displayName }) => {
+  handler: async (ctx, { roomCode, displayName, country, region, city}) => {
     if (!roomCode) {
       const roomCode = await generateRandomRoomCode(ctx);
-      await createRoomInternal({ ctx, roomCode, displayName });
+      await createRoomInternal({ ctx, roomCode, displayName, country, region, city});
       return roomCode;
     }
+
+    console.log("From JoinRoom Mutation : ",country,region,city)
 
     const room = await ctx.db
       .query("room")
@@ -61,7 +75,7 @@ export const joinRoom = mutation({
       .unique();
 
     if (!room) {
-      await createRoomInternal({ ctx, roomCode, displayName });
+      await createRoomInternal({ ctx, roomCode, displayName, country, region, city});
       return;
     }
 
@@ -73,13 +87,39 @@ export const joinRoom = mutation({
       .unique();
 
     if (participant) return;
+      
+    // For Dev env only will be removed when deployed
+    const TestCountry = 'CA'
+    const TestRegion = 'ON'
+    const TestCity = 'Toronto'
 
-    await ctx.db.insert("participant", {
+      if (country&& region && city) {
+      await ctx.db.insert("participant", {
       displayName,
       joinedAt: Date.now(),
       role: "user",
       roomId: room._id,
+      country: country,
+      region: region,
+      city: city,
     });
+    }
+
+    // For Dev env only will be removed when deployed
+    else {
+            await ctx.db.insert("participant", {
+      displayName,
+      joinedAt: Date.now(),
+      role: "user",
+      roomId: room._id,
+      country: TestCountry,
+      region: TestRegion,
+      city: TestCity,
+    });
+    }
+
+      
+
   },
 });
 
