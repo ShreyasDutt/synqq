@@ -19,11 +19,6 @@ type LeaveRoom = {
 
 export const joinRoomAction = async ({displayName, roomCode}: JoinRoom) => {
     const h = await headers();
-
-    const country = h.get("x-vercel-ip-country");
-    const region = h.get("x-vercel-ip-country-region");
-    const city = h.get("x-vercel-ip-city");
-    console.log(country,region,city,'from server')
     const createdRoomCode = await fetchMutation(api.room.joinRoom, {
     displayName,
     roomCode,

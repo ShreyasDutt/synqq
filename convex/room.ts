@@ -45,8 +45,8 @@ const createRoomInternal = async ({
     joinedAt: Date.now(),
     displayName,
     country: country || "IN",
-    region: region || "XY",
-    city: city || "Chandigarh",
+    region: region || "BC",
+    city: city || "Vancouver",
   });
 };
 
@@ -66,8 +66,6 @@ export const joinRoom = mutation({
       await createRoomInternal({ ctx, roomCode, displayName, country, region, city});
       return roomCode;
     }
-
-    console.log("From JoinRoom Mutation : ",country,region,city)
 
     const room = await ctx.db
       .query("room")
@@ -89,7 +87,7 @@ export const joinRoom = mutation({
     if (participant) return;
       
     // For Dev env only will be removed when deployed
-    const TestCountry = 'CA'
+    const TestCountry = 'IN'
     const TestRegion = 'ON'
     const TestCity = 'Toronto'
 

@@ -39,6 +39,16 @@ if (fullRoomData === undefined) {
   );
 }
 
+function countryCodeToEmoji(code: string | undefined) {
+  if (!code) return "🏳️"; // fallback
+  return code
+    .toUpperCase()
+    .replace(/./g, (char) =>
+      String.fromCodePoint(127397 + char.charCodeAt(0))
+    );
+}
+
+
   return (
     <div className="w-full">
       {fullRoomData.length > 0 &&(
@@ -57,20 +67,23 @@ if (fullRoomData === undefined) {
      <div className="flex flex-col items-stretch my-4">
         {fullRoomData.map((room,idx) => {
           return (
-            <BlurFade key={room.room._id} delay={0.25 + idx * 0.40} inView >
+            <BlurFade key={room.room._id} delay={0.25 + idx * 0.40} >
             <Link
               href={`/room/${room.room.roomCode}`}
               className="block w-full hover:bg-neutral-900/30 rounded-2xl"
             >
               <div className="flex w-full items-center justify-between gap-4 p-4 rounded-lg">
-                <div className="h-12 w-12 bg-accent rounded-lg"></div>
+                <div className="h-12 w-12 bg-neutral-400/20 rounded-lg justify-center items-center flex text-4xl">
+                   {countryCodeToEmoji(room.participants[0].country)}
+                   
+                </div>
 
                 <div className="flex-1">
                   <p className="text-md font-semibold">
                     {room.room.currentSong ?? "No song playing"}
                   </p>
                   <p className="text-xs text-neutral-400">
-                    {room.room.roomCode} Vancouver, BC
+                    {room.room.roomCode} {room.participants[0].city+" "+room.participants[0].region+" "+room.participants[0].country}
                   </p>
                 </div>
 
@@ -81,7 +94,7 @@ if (fullRoomData === undefined) {
                         {/* render country flags */}
                         <AvatarImage src="" />
                         <AvatarFallback>
-                          {participant.displayName.slice(0, 2).toUpperCase()}
+                          {countryCodeToEmoji(participant.country)}
                         </AvatarFallback>
                       </Avatar>
                     ))}
