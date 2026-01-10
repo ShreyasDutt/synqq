@@ -7,9 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { AlertCircle } from "lucide-react";
-
 import RoomHeroSection from "@/components/room/RoomHeroSection";
 import JoinRoom from "@/components/room/JoinRoom";
 

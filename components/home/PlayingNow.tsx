@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ChevronRight } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { Card } from "../ui/card";
+import { BlurFade } from "../ui/blur-fade";
 
 const PlayingNow = () => {
   const fullRoomData = useQuery(api.room.getRoomFullData);
@@ -27,8 +28,8 @@ if (fullRoomData === undefined) {
 
               {/* song + location */}
               <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-[200px]" />
-                <Skeleton className="h-3 w-[140px]" />
+                <Skeleton className="h-4 w-50" />
+                <Skeleton className="h-3 w-35" />
               </div>
             </div>
           </div>
@@ -54,10 +55,10 @@ if (fullRoomData === undefined) {
       </Card>
     )}
      <div className="flex flex-col items-stretch my-4">
-        {fullRoomData.map((room) => {
+        {fullRoomData.map((room,idx) => {
           return (
+            <BlurFade key={room.room._id} delay={0.25 + idx * 0.40} inView >
             <Link
-              key={room.room._id}
               href={`/room/${room.room.roomCode}`}
               className="block w-full hover:bg-neutral-900/30 rounded-2xl"
             >
@@ -95,6 +96,8 @@ if (fullRoomData === undefined) {
 
               </div>
             </Link>
+            </BlurFade>
+            
           );
         })}
       </div>
