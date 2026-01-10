@@ -1,8 +1,6 @@
 "use server";
 import { headers } from "next/headers";
 
-;
-
 import { api } from "@/convex/_generated/api";
 import { fetchMutation } from "convex/nextjs";
 type JoinRoom = {
@@ -13,9 +11,6 @@ type LeaveRoom = {
   displayName: string;
   roomCode: number;
 };
-
-
-
 
 export const joinRoomAction = async ({displayName, roomCode}: JoinRoom) => {
     const h = await headers();
@@ -29,7 +24,6 @@ export const joinRoomAction = async ({displayName, roomCode}: JoinRoom) => {
     if (!createdRoomCode) return;
     return createdRoomCode;
 };
-
 
 export const leaveRoomAction = async ({ displayName, roomCode }: LeaveRoom) => {
     await fetchMutation(api.room.leaveRoom, {displayName, roomCode})

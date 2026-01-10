@@ -1,8 +1,5 @@
-
 import { Button } from "@/components/ui/button";
 import { Minus } from "lucide-react";
-
-
 
 const tracks = [
   { id: 1, title: "Save Your Tears", artist: "The Weeknd", duration: "3:35" },

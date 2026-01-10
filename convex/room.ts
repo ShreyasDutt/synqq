@@ -37,6 +37,8 @@ const createRoomInternal = async ({
     currentSongState: false,
     currentLoopState: "none",
     currentSongProgress: 0.0,
+    playbackPermissions: "admins",
+    globalVolume: 75,
   });
 
   await ctx.db.insert("participant", {
@@ -50,7 +52,6 @@ const createRoomInternal = async ({
   });
 };
 
-
 //-----mutations----
 export const joinRoom = mutation({
   args: {
@@ -60,10 +61,17 @@ export const joinRoom = mutation({
     region: v.optional(v.string()),
     city: v.optional(v.string()),
   },
-  handler: async (ctx, { roomCode, displayName, country, region, city}) => {
+  handler: async (ctx, { roomCode, displayName, country, region, city }) => {
     if (!roomCode) {
       const roomCode = await generateRandomRoomCode(ctx);
-      await createRoomInternal({ ctx, roomCode, displayName, country, region, city});
+      await createRoomInternal({
+        ctx,
+        roomCode,
+        displayName,
+        country,
+        region,
+        city,
+      });
       return roomCode;
     }
 
@@ -73,7 +81,14 @@ export const joinRoom = mutation({
       .unique();
 
     if (!room) {
-      await createRoomInternal({ ctx, roomCode, displayName, country, region, city});
+      await createRoomInternal({
+        ctx,
+        roomCode,
+        displayName,
+        country,
+        region,
+        city,
+      });
       return;
     }
 
@@ -85,39 +100,36 @@ export const joinRoom = mutation({
       .unique();
 
     if (participant) return;
-      
-    // For Dev env only will be removed when deployed
-    const TestCountry = 'IN'
-    const TestRegion = 'ON'
-    const TestCity = 'Toronto'
 
-      if (country&& region && city) {
+    // For Dev env only will be removed when deployed
+    const TestCountry = "IN";
+    const TestRegion = "ON";
+    const TestCity = "Toronto";
+
+    if (country && region && city) {
       await ctx.db.insert("participant", {
-      displayName,
-      joinedAt: Date.now(),
-      role: "user",
-      roomId: room._id,
-      country: country,
-      region: region,
-      city: city,
-    });
+        displayName,
+        joinedAt: Date.now(),
+        role: "user",
+        roomId: room._id,
+        country: country,
+        region: region,
+        city: city,
+      });
     }
 
     // For Dev env only will be removed when deployed
     else {
-            await ctx.db.insert("participant", {
-      displayName,
-      joinedAt: Date.now(),
-      role: "user",
-      roomId: room._id,
-      country: TestCountry,
-      region: TestRegion,
-      city: TestCity,
-    });
+      await ctx.db.insert("participant", {
+        displayName,
+        joinedAt: Date.now(),
+        role: "user",
+        roomId: room._id,
+        country: TestCountry,
+        region: TestRegion,
+        city: TestCity,
+      });
     }
-
-      
-
   },
 });
 
@@ -162,7 +174,6 @@ export const leaveRoom = mutation({
   },
 });
 
-
 //----queries----
 export const getRooms = query({
   args: {},
@@ -173,17 +184,26 @@ export const getRooms = query({
 
 export const getRoomData = query({
   args: {
-    roomCode: v.number()
+    roomCode: v.number(),
   },
   handler: async (ctx, { roomCode }) => {
-    const room = await ctx.db.query("room").withIndex('byRoomCode', (q => q.eq("roomCode", roomCode))).unique();
-    
-    if (!room) return console.error("Error while getting room in the getRoomParticipants query")
-    
-    const participants = await ctx.db.query("participant").withIndex("byRoomId", (q => q.eq("roomId", room._id))).collect();
+    const room = await ctx.db
+      .query("room")
+      .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
+      .unique();
+
+    if (!room)
+      return console.error(
+        "Error while getting room in the getRoomParticipants query"
+      );
+
+    const participants = await ctx.db
+      .query("participant")
+      .withIndex("byRoomId", (q) => q.eq("roomId", room._id))
+      .collect();
     return { room, participants };
-  }
-})
+  },
+});
 
 // get both room and users
 

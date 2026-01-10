@@ -1,5 +1,6 @@
-import { Music, Users } from 'lucide-react'
+import { Music } from 'lucide-react'
 import Link from 'next/link'
+import TabNavClient from './TabNavClient';
 
 const TabNav = () => {
   return (
@@ -11,11 +12,7 @@ const TabNav = () => {
             <span>Synq</span>
           </div>
         </Link>
-        <span>#403360</span>
-        <div className="flex items-center gap-1">
-          <Users size={14} />
-          <span>1 user</span>
-        </div>
+        <TabNavClient />
       </div>
 
       <Link href="/" aria-label="GitHub repository">

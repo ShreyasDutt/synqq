@@ -1,6 +1,6 @@
 "use client";
 
-import { joinRoomAction } from "@/app/actions/room.actions";
+import { joinRoomAction, leaveRoomAction } from "@/app/actions/room.actions";
 import { createdRoomAtom, displayNameAtom } from "@/atoms/atoms";
 import { roomDataAtom } from "@/atoms/convexQueriesAtoms";
 import { api } from "@/convex/_generated/api";
@@ -28,8 +28,14 @@ const JoinRoom = ({ recievedRoomCode }: { recievedRoomCode: string }) => {
     }
   };
 
+  const leaveRoom = async () => {
+    await leaveRoomAction({displayName, roomCode})
+  }
+
   useEffect(() => {
     joinRoom();
+    return () => {
+    }
   }, []);
 
   const roomData = useQuery(api.room.getRoomData, {
@@ -42,7 +48,6 @@ const JoinRoom = ({ recievedRoomCode }: { recievedRoomCode: string }) => {
     }
   }, [roomData, setRoomData]);
   
-
   return null;
 };
 

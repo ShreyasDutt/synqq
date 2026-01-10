@@ -11,7 +11,6 @@ import { countryCodeToEmoji } from "@/lib/generateName";
 
 const PlayingNow = () => {
   const fullRoomData = useQuery(api.room.getRoomFullData);
-  console.log(fullRoomData)
 if (fullRoomData === undefined) {
   return (
     <div className="mb-2">

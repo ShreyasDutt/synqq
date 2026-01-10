@@ -10,6 +10,8 @@ type Room = {
   currentSongState: boolean;
   currentLoopState: string;
   currentSongProgress: number;
+  playbackPermissions: "admins" | "everyone",
+  globalVolume: number;
 };
 
 type RoomParticipant = {

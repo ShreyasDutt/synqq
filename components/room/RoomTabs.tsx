@@ -8,7 +8,6 @@ import FlexTab from "./FlexTab";
 
 const RoomTabs = () => {
     const [roomTab] = useAtom(roomTabAtom);
-    console.log(roomTab)
   return (
     <>
     <div className="lg:hidden h-full">

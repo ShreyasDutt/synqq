@@ -9,31 +9,9 @@ import { countryCodeToEmoji } from '@/lib/generateName'
 import { useAtom } from 'jotai'
 import { Crown, Play, QrCode, Users, Volume2 } from 'lucide-react'
 
-const users = [
-  {
-    id: "u1",
-    name: "amiable-cat",
-    isYou: true,
-    isAdmin: true,
-  },
-  {
-    id: "u2",
-    name: "brave-otter",
-    isYou: false,
-    isAdmin: false,
-  },
-  {
-    id: "u3",
-    name: "curious-fox",
-    isYou: false,
-    isAdmin: false,
-  },
-]
-
 const SessionTab = () => {
   const [roomData] = useAtom(roomDataAtom);
   const [displayName] = useAtom(displayNameAtom);
-  console.log("roomData: ",roomData)
   return (
     <div>
       {/* Session Nav */}
@@ -54,12 +32,29 @@ const SessionTab = () => {
         </div>
 
         <ButtonGroup className="w-full flex lg:bg-neutral-900">
-          <Button className="flex-1" variant="outline">
-            <Users />
+          <Button
+            className="flex-1"
+            variant={
+              roomData?.room.playbackPermissions === "everyone"
+                ? "default"
+                : "outline"
+            }
+            // onClick={()=>}
+          >
+            <Users className="mr-2" />
             Everyone
           </Button>
-          <Button className="flex-1" variant="outline">
-            <Crown />
+
+          <Button
+            className="flex-1"
+            variant={
+              roomData?.room.playbackPermissions === "admins"
+                ? "default"
+                : "outline"
+            }
+            // onClick={() =>}
+          >
+            <Crown className="mr-2" />
             Admins
           </Button>
         </ButtonGroup>
@@ -74,8 +69,13 @@ const SessionTab = () => {
           <p>Global Volume</p>
         </div>
         <div className="flex items-center gap-2">
-          <Progress value={75} className="w-full" />
-          <p className="text-xs text-neutral-400">75%</p>
+          <Progress
+            value={roomData?.room.globalVolume || null}
+            className="w-full"
+          />
+          <p className="text-xs text-neutral-400">
+            {roomData?.room.globalVolume}%
+          </p>
         </div>
       </div>
 

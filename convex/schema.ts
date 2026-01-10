@@ -9,7 +9,7 @@ export default defineSchema({
     region:v.string(),
     city:v.string(),
     roomId: v.string(),
-    role: v.string(), //Admin or User
+    role: v.string(), //admin or user
     joinedAt: v.number()
   }).index("byDisplayName", ["displayName"]). index("byRoomId", ["roomId"]). index("byDisplayNameAndRoomId", ["displayName","roomId"]),
 
@@ -21,5 +21,7 @@ export default defineSchema({
     currentSongState: v.boolean(), //default set to false
     currentLoopState: v.string(), //album or song or none
     currentSongProgress: v.number(),
+    playbackPermissions: v.string(), //admins or everyone
+    globalVolume: v.number(), //1 to 100
   }).index("byRoomCode", ["roomCode"]),
 });
