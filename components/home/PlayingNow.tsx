@@ -112,10 +112,7 @@ if (fullRoomData === undefined) {
                         <>
                           {uniqueParticipants.map((participant) => (
                             <Avatar key={participant._id}>
-                              <AvatarImage
-                                src=""
-                                alt={participant.country}
-                              />
+                              <AvatarImage src=" "/>
                               <AvatarFallback>
                                 {countryCodeToEmoji(participant.country)}
                               </AvatarFallback>
