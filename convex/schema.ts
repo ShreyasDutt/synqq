@@ -28,6 +28,7 @@ export default defineSchema({
   message: defineTable({
     roomId: v.string(),
     sendBy: v.string(), //displayName of the user
-    createdAt: v.number()
+    createdAt: v.number(),
+    content: v.string(),
   }).index("byRoomId", ["roomId"])
 });

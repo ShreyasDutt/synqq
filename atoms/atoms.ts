@@ -7,5 +7,6 @@ export enum RoomTab {
 }
 
 export const displayNameAtom = atom<string>("");
+export const roomCodeAtom = atom<number>();
 export const createdRoomAtom = atom<boolean>(false);
 export const roomTabAtom = atom<RoomTab>(RoomTab.MUSIC);

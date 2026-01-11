@@ -174,6 +174,42 @@ export const leaveRoom = mutation({
   },
 });
 
+export const everyonePermission = mutation({
+  args: {
+    roomCode: v.number(),
+  },
+  handler: async (ctx , {roomCode}) => {
+    const room = await ctx.db
+      .query("room")
+      .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
+      .unique();
+    if (!room) {
+      console.error("Room not found!!");
+      return { success: false };
+    }
+    await ctx.db.patch(room._id, { playbackPermissions: "everyone" });
+    return { success: true };
+  }
+})
+
+export const adminsPermission = mutation({
+  args: {
+    roomCode: v.number(),
+  },
+  handler: async (ctx, { roomCode }) => {
+    const room = await ctx.db
+      .query("room")
+      .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
+      .unique();
+    if (!room) {
+      console.error("Room not found!!")
+      return ({success: false})
+    };
+    await ctx.db.patch(room._id, { playbackPermissions: "admins" });
+    return ({ success: true });
+  },
+});
+
 //----queries----
 export const getRooms = query({
   args: {},

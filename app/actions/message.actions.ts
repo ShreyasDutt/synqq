@@ -3,13 +3,14 @@
 import { api } from "@/convex/_generated/api"
 import { fetchMutation } from "convex/nextjs"
 
-type sendMessage = {
+type SendMessage = {
     displayName: string,
-    message: string,
     roomCode: number
 }
-const sendMessageAction = async ({displayName, message, roomCode}: sendMessage) => {
-    const data = fetchMutation(api.message.sendMessage, {
+export const sendMessageAction = async ({ displayName, roomCode}: SendMessage, formData: FormData) => {
+    const message = formData.get('message')?.toString();
+    if (!message) return console.error("No message recieved in the sendMessageAction");
+    await fetchMutation(api.message.sendMessage, {
         displayName,
         message,
         roomCode

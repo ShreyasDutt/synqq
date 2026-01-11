@@ -1,5 +1,6 @@
 "use client"
-import { displayNameAtom } from '@/atoms/atoms'
+import { adminsPermissionAction, everyonePermissionAction } from '@/app/actions/room.actions'
+import { displayNameAtom, roomCodeAtom } from '@/atoms/atoms'
 import { roomDataAtom } from '@/atoms/convexQueriesAtoms'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -12,6 +13,11 @@ import { Crown, Play, QrCode, Users, Volume2 } from 'lucide-react'
 const SessionTab = () => {
   const [roomData] = useAtom(roomDataAtom);
   const [displayName] = useAtom(displayNameAtom);
+  const [roomCode] = useAtom(roomCodeAtom);
+  if (!roomCode) {
+    console.error("Room code not found!!");
+    return null;
+  }
   return (
     <div>
       {/* Session Nav */}
@@ -39,7 +45,8 @@ const SessionTab = () => {
                 ? "default"
                 : "outline"
             }
-            // onClick={()=>}
+            disabled={roomData?.room.playbackPermissions === "everyone"}
+            onClick={async () => everyonePermissionAction({ roomCode })}
           >
             <Users className="mr-2" />
             Everyone
@@ -52,7 +59,8 @@ const SessionTab = () => {
                 ? "default"
                 : "outline"
             }
-            // onClick={() =>}
+            disabled={roomData?.room.playbackPermissions === "admins"}
+            onClick={async () => adminsPermissionAction({ roomCode })}
           >
             <Crown className="mr-2" />
             Admins

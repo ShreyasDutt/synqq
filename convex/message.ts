@@ -22,6 +22,7 @@ export const sendMessage = mutation({
       roomId: room._id,
       sendBy: displayName,
       createdAt: Date.now(),
+      content: message,
     });
     return { success: true };
   },

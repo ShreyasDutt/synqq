@@ -1,7 +1,7 @@
 "use client";
 
 import { joinRoomAction, leaveRoomAction } from "@/app/actions/room.actions";
-import { createdRoomAtom, displayNameAtom } from "@/atoms/atoms";
+import { createdRoomAtom, displayNameAtom, roomCodeAtom } from "@/atoms/atoms";
 import { roomDataAtom } from "@/atoms/convexQueriesAtoms";
 import { api } from "@/convex/_generated/api";
 import { generateRandomName } from "@/lib/generateName";
@@ -10,7 +10,9 @@ import { useAtom, useSetAtom } from "jotai";
 import { useEffect } from "react";
 
 const JoinRoom = ({ recievedRoomCode }: { recievedRoomCode: string }) => {
+  const setRoomCode = useSetAtom(roomCodeAtom);
   const roomCode = Number(recievedRoomCode);
+  setRoomCode(roomCode);
   const [displayName, setDisplayName] = useAtom(displayNameAtom);
   const [createdRoom] = useAtom(createdRoomAtom);
   const setRoomData = useSetAtom(roomDataAtom);
