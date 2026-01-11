@@ -24,4 +24,10 @@ export default defineSchema({
     playbackPermissions: v.string(), //admins or everyone
     globalVolume: v.number(), //1 to 100
   }).index("byRoomCode", ["roomCode"]),
+
+  message: defineTable({
+    roomId: v.string(),
+    sendBy: v.string(), //displayName of the user
+    createdAt: v.number()
+  }).index("byRoomId", ["roomId"])
 });

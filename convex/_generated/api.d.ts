@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as message from "../message.js";
 import type * as room from "../room.js";
 
 import type {
@@ -17,6 +18,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  message: typeof message;
   room: typeof room;
 }>;
 
