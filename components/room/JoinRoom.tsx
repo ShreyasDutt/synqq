@@ -1,11 +1,11 @@
 "use client";
 
-import { joinRoomAction, leaveRoomAction } from "@/app/actions/room.actions";
+import { joinRoomAction } from "@/app/actions/room.actions";
 import { createdRoomAtom, displayNameAtom, roomCodeAtom } from "@/atoms/atoms";
 import { roomDataAtom } from "@/atoms/convexQueriesAtoms";
 import { api } from "@/convex/_generated/api";
 import { generateRandomName } from "@/lib/generateName";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useAtom, useSetAtom } from "jotai";
 import { useEffect } from "react";
 
@@ -16,6 +16,7 @@ const JoinRoom = ({ recievedRoomCode }: { recievedRoomCode: string }) => {
   const [displayName, setDisplayName] = useAtom(displayNameAtom);
   const [createdRoom] = useAtom(createdRoomAtom);
   const setRoomData = useSetAtom(roomDataAtom);
+  const updateLastSeen = useMutation(api.room.UpdateLastSeen);
   const joinRoom = async () => {
     if (!createdRoom) {
       if (displayName === "") {
@@ -30,15 +31,18 @@ const JoinRoom = ({ recievedRoomCode }: { recievedRoomCode: string }) => {
     }
   };
 
-  const leaveRoom = async () => {
-    await leaveRoomAction({displayName, roomCode})
-  }
-
   useEffect(() => {
     joinRoom();
-    return () => {
-    }
   }, []);
+
+useEffect(() => {
+
+  const id = setInterval(() => {
+    updateLastSeen({ roomCode, displayName });
+  }, 10_000);
+
+  return () => clearInterval(id);
+}, [roomCode, displayName, updateLastSeen]);
 
   const roomData = useQuery(api.room.getRoomData, {
     roomCode,

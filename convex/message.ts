@@ -37,21 +37,20 @@ export const getMessages = query({
       .query("room")
       .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
       .unique();
+
     if (!room) {
-      console.error(
-        `Room not found while getting messages for roomCode: ${roomCode}`
-      );
-      return { success: false };
+      return { success: false, messages: [] };
     }
 
     const messages = await ctx.db
       .query("message")
-      .withIndex("byRoomId")
+      .withIndex("byRoomId", (q) => q.eq("roomId", room._id))
       .collect();
-    if (!messages) {
-      console.error(`Messages not found for roomCode: ${roomCode}`);
-      return { success: false };
-    }
-    return { messages, success: true };
+
+    return {
+      success: true,
+      messages,
+    };
   },
 });
+

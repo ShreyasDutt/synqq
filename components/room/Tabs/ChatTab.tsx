@@ -27,7 +27,6 @@ const ChatTab = () => {
     console.error("Unable to find roomCode!!");
     return null;
   }
-
   const chatData = useQuery(api.message.getMessages, { roomCode });
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -108,9 +107,6 @@ const ChatTab = () => {
               name="message"
               onKeyDown={handleKeyDown}
             />
-            <button type="submit">
-              <Send />
-            </button>
           </form>
         </CardFooter>
       </Card>

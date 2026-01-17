@@ -10,7 +10,8 @@ export default defineSchema({
     city:v.string(),
     roomId: v.string(),
     role: v.string(), //admin or user
-    joinedAt: v.number()
+    joinedAt: v.number(),
+    lastSeen: v.number(),
   }).index("byDisplayName", ["displayName"]). index("byRoomId", ["roomId"]). index("byDisplayNameAndRoomId", ["displayName","roomId"]),
 
   room: defineTable({
