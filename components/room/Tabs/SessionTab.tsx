@@ -1,14 +1,26 @@
-"use client"
-import { adminsPermissionAction, everyonePermissionAction } from '@/app/actions/room.actions'
-import { displayNameAtom, roomCodeAtom } from '@/atoms/atoms'
-import { roomDataAtom } from '@/atoms/convexQueriesAtoms'
-import { Button } from '@/components/ui/button'
-import { ButtonGroup } from '@/components/ui/button-group'
-import { Progress } from '@/components/ui/progress'
-import { Separator } from '@/components/ui/separator'
-import { countryCodeToEmoji } from '@/lib/generateName'
-import { useAtom } from 'jotai'
-import { Crown, Play, QrCode, Users, Volume2 } from 'lucide-react'
+"use client";
+import {
+  adminsPermissionAction,
+  everyonePermissionAction,
+} from "@/app/actions/room.actions";
+import { displayNameAtom, roomCodeAtom } from "@/atoms/atoms";
+import { roomDataAtom } from "@/atoms/convexQueriesAtoms";
+import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { countryCodeToEmoji } from "@/lib/generateName";
+import { useAtom } from "jotai";
+import {
+  Crown,
+  Play,
+  Plus,
+  PlusCircle,
+  PlusIcon,
+  QrCode,
+  Users,
+  Volume2,
+} from "lucide-react";
 
 const SessionTab = () => {
   const [roomData] = useAtom(roomDataAtom);
@@ -19,7 +31,7 @@ const SessionTab = () => {
     return null;
   }
   return (
-    <div>
+    <div className="flex flex-col h-full">
       {/* Session Nav */}
       <div className="flex items-center justify-between px-4 py-3 lg:bg-neutral-900">
         <p># Room {roomData?.room.roomCode}</p>
@@ -128,8 +140,21 @@ const SessionTab = () => {
           ))}
         </div>
       </div>
+
+      <label className="flex items-center gap-3 py-2 px-3 border rounded-lg m-3 mt-auto hover:bg-muted-foreground/10 cursor-pointer">
+        <input type="file" className="hidden" accept="audio/*"/>
+        <div className="bg-primary p-1 rounded-lg">
+          <Plus />
+        </div>
+        <div>
+          <div className="text-foreground text-sm">Upload audio</div>
+          <div className="text-muted-foreground text-[12px]">
+            Add music to queue
+          </div>
+        </div>
+      </label>
     </div>
   );
-}
+};
 
-export default SessionTab
+export default SessionTab;

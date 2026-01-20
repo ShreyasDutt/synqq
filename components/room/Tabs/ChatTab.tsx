@@ -68,7 +68,7 @@ const ChatTab = () => {
                         }`}
                       >
                         <div
-                          className={`p-2 sm:p-3 flex flex-col gap-1 rounded-lg max-w-[80%] sm:max-w-[70%] break-words ${
+                          className={`px-3 py-1 flex flex-col rounded-lg max-w-[80%] sm:max-w-[70%] wrap-break-word ${
                             isMe
                               ? "bg-primary text-primary-foreground"
                               : "bg-foreground/70 text-black"
@@ -78,13 +78,15 @@ const ChatTab = () => {
                             {isMe ? "You" : message.sendBy}
                           </p>
 
-                          <p className="text-sm sm:text-[15px]">
-                            {message.content}
-                          </p>
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm sm:text-[15px]">
+                              {message.content}
+                            </p>
 
-                          <p className="text-[9px] sm:text-[10px] opacity-60 text-right">
-                            {formatTime(message.createdAt)}
-                          </p>
+                            <p className="text-[9px] sm:text-[10px] opacity-60 text-right mt-2">
+                              {formatTime(message.createdAt)}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     );
