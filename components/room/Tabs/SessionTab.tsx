@@ -9,20 +9,24 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { api } from "@/convex/_generated/api";
 import { countryCodeToEmoji } from "@/lib/generateName";
+import { useMutation } from "convex/react";
 import { useAtom } from "jotai";
 import {
   Crown,
   Play,
   Plus,
-  PlusCircle,
-  PlusIcon,
   QrCode,
+  Upload,
   Users,
   Volume2,
 } from "lucide-react";
+import { parseBlob } from "music-metadata";
+import { useState } from "react";
 
 const SessionTab = () => {
+  const changeVolume = useMutation(api.room.changeVolume);
   const [roomData] = useAtom(roomDataAtom);
   const [displayName] = useAtom(displayNameAtom);
   const [roomCode] = useAtom(roomCodeAtom);
@@ -30,6 +34,37 @@ const SessionTab = () => {
     console.error("Room code not found!!");
     return null;
   }
+
+  const [uploading, setUploading] = useState(false);
+  const generateUploadUrlMutation = useMutation(api.song.generateUploadUrl);
+  const uploadSongMutation = useMutation(api.song.uploadSong);
+  const uploadSong = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const metadata = await parseBlob(file);
+    const duration = metadata.format.duration;
+    if (!duration) return console.error("Duration not found!!");
+
+    const postUrl = await generateUploadUrlMutation();
+    const result = await fetch(postUrl, {
+      method: "POST",
+      headers: { "Content-Type": file.type },
+      body: file,
+    });
+    const { storageId } = await result.json();
+
+    await uploadSongMutation({
+      duration,
+      roomCode,
+      storageId,
+      title: file.name,
+    });
+
+    setUploading(false);
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Session Nav */}
@@ -83,23 +118,33 @@ const SessionTab = () => {
       <Separator />
 
       {/* Global Volume */}
-      <div className="px-4 py-4 flex flex-col gap-3 lg:bg-neutral-900">
+      <div className="px-4 py-4 flex flex-col gap-3 lg:bg-neutral-900 lg:hidden">
         <div className="flex items-center gap-2 text-sm text-neutral-400 uppercase">
           <Volume2 size={15} />
           <p>Global Volume</p>
         </div>
         <div className="flex items-center gap-2">
-          <Progress
-            value={roomData?.room.globalVolume || null}
-            className="w-full"
+          <input
+            type="range"
+            min="0"
+            max="100"
+            className="w-full accent-foreground hover:accent-primary
+            [&::-webkit-slider-thumb]:opacity-0
+            hover:[&::-webkit-slider-thumb]:opacity-100
+            "
+            value={roomData?.room.globalVolume ?? 75}
+            onChange={(e) =>
+              changeVolume({ roomCode, globalVolume: Number(e.target.value) })
+            }
           />
+
           <p className="text-xs text-neutral-400">
             {roomData?.room.globalVolume}%
           </p>
         </div>
       </div>
 
-      <Separator />
+      <Separator className="lg:hidden" />
 
       {/* Connected Users */}
       <div className="px-4 py-4 flex flex-col gap-4 lg:bg-neutral-900">
@@ -142,16 +187,35 @@ const SessionTab = () => {
       </div>
 
       <label className="flex items-center gap-3 py-2 px-3 border rounded-lg m-3 mt-auto hover:bg-muted-foreground/10 cursor-pointer">
-        <input type="file" className="hidden" accept="audio/*"/>
-        <div className="bg-primary p-1 rounded-lg">
-          <Plus />
-        </div>
-        <div>
-          <div className="text-foreground text-sm">Upload audio</div>
-          <div className="text-muted-foreground text-[12px]">
-            Add music to queue
-          </div>
-        </div>
+        <input
+          type="file"
+          className="hidden"
+          accept="audio/*"
+          onChange={uploadSong}
+          disabled={uploading}
+        />
+        {uploading ? (
+          <>
+            <>
+              <div className="bg-primary p-2 rounded-lg">
+                <Upload size={20} />
+              </div>
+              <div className="text-foreground text-md">Uploading...</div>
+            </>
+          </>
+        ) : (
+          <>
+            <div className="bg-primary p-2 rounded-lg">
+              <Plus size={20} />
+            </div>
+            <div>
+              <div className="text-foreground text-sm">Upload audio</div>
+              <div className="text-muted-foreground text-[12px]">
+                Add music to queue
+              </div>
+            </div>
+          </>
+        )}
       </label>
     </div>
   );

@@ -1,12 +1,27 @@
-"use client"
-import { Play, Repeat, Shuffle, SkipBack, SkipForward, Volume2 } from "lucide-react"
-import { Progress } from "../ui/progress"
+"use client";
+import {
+  Play,
+  Repeat,
+  Shuffle,
+  SkipBack,
+  SkipForward,
+  Volume2,
+} from "lucide-react";
+import { Progress } from "../ui/progress";
 import { useAtom } from "jotai";
 import { roomDataAtom } from "@/atoms/convexQueriesAtoms";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { roomCodeAtom } from "@/atoms/atoms";
 
 const MusicPlayer = () => {
   const [roomData] = useAtom(roomDataAtom);
-  console.log("datt: ",roomData)
+  const [roomCode] = useAtom(roomCodeAtom);
+  if (!roomCode) {
+    console.error("Room Code not found!!");
+    return null;
+  }
+  const changeVolume = useMutation(api.room.changeVolume);
   return (
     <div className="w-full">
       {/* Desktop Layout */}
@@ -42,9 +57,17 @@ const MusicPlayer = () => {
 
         <div className="flex items-center gap-2 w-32">
           <Volume2 size={20} className="text-neutral-400" />
-          <Progress
-            value={roomData?.room.globalVolume || null}
-            className="w-full"
+          <input
+            type="range"
+            min="0"
+            max="100"
+            className="w-full accent-foreground hover:accent-primary
+            [&::-webkit-slider-thumb]:opacity-0
+            hover:[&::-webkit-slider-thumb]:opacity-100"
+            value={roomData?.room.globalVolume ?? 75}
+            onChange={(e) =>
+              changeVolume({ roomCode, globalVolume: Number(e.target.value) })
+            }
           />
         </div>
       </div>
@@ -72,6 +95,6 @@ const MusicPlayer = () => {
       </div>
     </div>
   );
-}
+};
 
-export default MusicPlayer
+export default MusicPlayer;

@@ -2,17 +2,19 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-
   participant: defineTable({
     displayName: v.string(),
-    country:v.string(),
-    region:v.string(),
-    city:v.string(),
-    roomId: v.string(),
+    country: v.string(),
+    region: v.string(),
+    city: v.string(),
+    roomId: v.id('room'),
     role: v.string(), //admin or user
     joinedAt: v.number(),
     lastSeen: v.number(),
-  }).index("byDisplayName", ["displayName"]). index("byRoomId", ["roomId"]). index("byDisplayNameAndRoomId", ["displayName","roomId"]),
+  })
+    .index("byDisplayName", ["displayName"])
+    .index("byRoomId", ["roomId"])
+    .index("byDisplayNameAndRoomId", ["displayName", "roomId"]),
 
   room: defineTable({
     roomCode: v.number(),
@@ -27,9 +29,16 @@ export default defineSchema({
   }).index("byRoomCode", ["roomCode"]),
 
   message: defineTable({
-    roomId: v.string(),
+    roomId: v.id('room'),
     sendBy: v.string(), //displayName of the user
     createdAt: v.number(),
     content: v.string(),
-  }).index("byRoomId", ["roomId"])
+  }).index("byRoomId", ["roomId"]),
+
+  song: defineTable({
+    roomId: v.id('room'),
+    title: v.string(),
+    duration: v.number(),
+    storageId: v.id('_storage')
+  }).index("byRoomId", ["roomId"]),
 });

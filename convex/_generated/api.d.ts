@@ -10,6 +10,7 @@
 
 import type * as message from "../message.js";
 import type * as room from "../room.js";
+import type * as song from "../song.js";
 
 import type {
   ApiFromModules,
@@ -20,6 +21,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   message: typeof message;
   room: typeof room;
+  song: typeof song;
 }>;
 
 /**

@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query, MutationCtx } from "./_generated/server";
-import {cleanupStaleParticipants} from '../lib/participantCleaner'
+import { cleanupStaleParticipants } from "../lib/participantCleaner";
 
 type createRoomInternal = {
   ctx: MutationCtx;
@@ -97,7 +97,7 @@ export const joinRoom = mutation({
     const participant = await ctx.db
       .query("participant")
       .withIndex("byDisplayNameAndRoomId", (q) =>
-        q.eq("displayName", displayName).eq("roomId", room._id)
+        q.eq("displayName", displayName).eq("roomId", room._id),
       )
       .unique();
 
@@ -137,12 +137,11 @@ export const joinRoom = mutation({
   },
 });
 
-
 export const everyonePermission = mutation({
   args: {
     roomCode: v.number(),
   },
-  handler: async (ctx , {roomCode}) => {
+  handler: async (ctx, { roomCode }) => {
     const room = await ctx.db
       .query("room")
       .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
@@ -153,8 +152,8 @@ export const everyonePermission = mutation({
     }
     await ctx.db.patch(room._id, { playbackPermissions: "everyone" });
     return { success: true };
-  }
-})
+  },
+});
 
 export const adminsPermission = mutation({
   args: {
@@ -166,16 +165,15 @@ export const adminsPermission = mutation({
       .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
       .unique();
     if (!room) {
-      console.error("Room not found!!")
-      return ({success: false})
-    };
+      console.error("Room not found!!");
+      return { success: false };
+    }
     await ctx.db.patch(room._id, { playbackPermissions: "admins" });
-    return ({ success: true });
+    return { success: true };
   },
 });
 
 //----queries----
-
 
 export const getRoomData = query({
   args: {
@@ -189,7 +187,7 @@ export const getRoomData = query({
 
     if (!room)
       return console.error(
-        "Error while getting room in the getRoomParticipants query"
+        "Error while getting room in the getRoomParticipants query",
       );
 
     const participants = await ctx.db
@@ -225,21 +223,44 @@ export const getRoomFullData = query({
   },
 });
 
-
 export const UpdateLastSeen = mutation({
   args: {
     displayName: v.string(),
     roomCode: v.number(),
   },
   handler: async (ctx, { displayName, roomCode }) => {
-    const room = await ctx.db.query('room').withIndex('byRoomCode', q => q.eq('roomCode',roomCode)).unique();
-    if(!room) return console.error("Room not found while updating last seen");
+    const room = await ctx.db
+      .query("room")
+      .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
+      .unique();
+    if (!room) return console.error("Room not found while updating last seen");
 
-    const participant = await ctx.db.query('participant').withIndex('byDisplayNameAndRoomId', q => q.eq('displayName',displayName).eq('roomId',room._id)).unique();
+    const participant = await ctx.db
+      .query("participant")
+      .withIndex("byDisplayNameAndRoomId", (q) =>
+        q.eq("displayName", displayName).eq("roomId", room._id),
+      )
+      .unique();
 
-    if(!participant) return console.error("Participant not found while updating last seen");
-    
+    if (!participant)
+      return console.error("Participant not found while updating last seen");
+
     await ctx.db.patch(participant._id, { lastSeen: Date.now() });
     await cleanupStaleParticipants(ctx, room._id);
-  }
-})
+  },
+});
+
+export const changeVolume = mutation({
+  args: {
+    roomCode: v.number(),
+    globalVolume: v.number(),
+  },
+  handler: async (ctx, { roomCode, globalVolume }) => {
+    const room = await ctx.db
+      .query("room")
+      .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
+      .unique();
+    if (!room) return console.error("Room not found!!");
+    await ctx.db.patch(room._id, { globalVolume });
+  },
+});
