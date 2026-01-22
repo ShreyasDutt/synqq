@@ -1,7 +1,8 @@
+import { Id } from "@/convex/_generated/dataModel";
 import { atom } from "jotai";
 
 type Room = {
-  _id: string;
+  _id: Id<"room">;
   _creationTime: number;
   songsQueue?: string[];
   currentSong?: string;
@@ -15,10 +16,10 @@ type Room = {
 };
 
 type RoomParticipant = {
-  _id: string;
+  _id: Id<"participant">;
   _creationTime: number;
   displayName: string;
-  roomId: string;
+  roomId: Id<"room">;
   role: string;
   joinedAt: number | null | undefined;
   country: string;
@@ -30,3 +31,5 @@ type RoomData = {
 };
 
 export const roomDataAtom = atom<RoomData | undefined | null>();
+
+export const amIAdminAtom = atom<boolean>(false);

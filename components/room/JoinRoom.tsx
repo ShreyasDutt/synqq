@@ -39,7 +39,7 @@ useEffect(() => {
 
   const id = setInterval(() => {
     updateLastSeen({ roomCode, displayName });
-  }, 10_000);
+  }, 55_000);
 
   return () => clearInterval(id);
 }, [roomCode, displayName, updateLastSeen]);

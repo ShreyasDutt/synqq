@@ -9,12 +9,13 @@ import {
 } from "lucide-react";
 import { Progress } from "../ui/progress";
 import { useAtom } from "jotai";
-import { roomDataAtom } from "@/atoms/convexQueriesAtoms";
+import { amIAdminAtom, roomDataAtom } from "@/atoms/convexQueriesAtoms";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { roomCodeAtom } from "@/atoms/atoms";
 
 const MusicPlayer = () => {
+  const [amIAdmin] = useAtom(amIAdminAtom);
   const [roomData] = useAtom(roomDataAtom);
   const [roomCode] = useAtom(roomCodeAtom);
   if (!roomCode) {
@@ -61,12 +62,15 @@ const MusicPlayer = () => {
             type="range"
             min="0"
             max="100"
-            className="w-full accent-foreground hover:accent-primary
+            className={`w-full accent-foreground hover:accent-primary
             [&::-webkit-slider-thumb]:opacity-0
-            hover:[&::-webkit-slider-thumb]:opacity-100"
+             ${(amIAdmin || (roomData?.room.playbackPermissions === "everyone")) && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
             value={roomData?.room.globalVolume ?? 75}
             onChange={(e) =>
               changeVolume({ roomCode, globalVolume: Number(e.target.value) })
+            }
+            disabled={
+              !amIAdmin && !(roomData?.room.playbackPermissions === "everyone")
             }
           />
         </div>

@@ -9,23 +9,32 @@ import { Card, CardDescription, CardFooter, CardTitle } from "../ui/card";
 import DisplayName from "./DisplayName";
 import CreateRoomButton from "./CreateRoomButton";
 import { useRouter } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const JoinwithCode = () => {
   const router = useRouter();
+  const activeParticipants = useQuery(api.room.activeParticipants);
   return (
     <div className="flex items-center justify-center">
       <Card className="w-92 lg:w-106 2xl:w-113 flex">
         <div className="flex items-center justify-center flex-col gap-4">
           <CardTitle className="text-sm font-light text-gray-600 flex items-center gap-2">
-            <p className="h-2.5 w-2.5 bg-primary rounded-full animate-pulse"></p>
-            25 people are listening now
+            <p className="h-2.5 w-2.5 bg-primary rounded-full animate-pulse"/>
+              {activeParticipants} people are listening now
+           
           </CardTitle>
           <CardTitle className=" 2xl:text-lg">Join a Synq Room</CardTitle>
           <CardDescription>
             Enter a room code to join or create a new room
           </CardDescription>
-          <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS}
-            onChange={(v => { if (v.length === 6) router.push(`room/${v}`) })}>
+          <InputOTP
+            maxLength={6}
+            pattern={REGEXP_ONLY_DIGITS}
+            onChange={(v) => {
+              if (v.length === 6) router.push(`room/${v}`);
+            }}
+          >
             <InputOTPGroup className="gap-2">
               <InputOTPSlot index={0} />
               <InputOTPSlot index={1} />

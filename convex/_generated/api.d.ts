@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as crons from "../crons.js";
 import type * as message from "../message.js";
 import type * as room from "../room.js";
 import type * as song from "../song.js";
@@ -19,6 +20,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  crons: typeof crons;
   message: typeof message;
   room: typeof room;
   song: typeof song;
