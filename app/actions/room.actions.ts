@@ -25,9 +25,6 @@ export const joinRoomAction = async ({ displayName, roomCode }: JoinRoom) => {
   return createdRoomCode;
 };
 
-export const leaveRoomAction = async ({ displayName, roomCode }: LeaveRoom) => {
-  await fetchMutation(api.room.leaveRoom, { displayName, roomCode });
-};
 
 export const everyonePermissionAction = async ({roomCode}: {roomCode: number}) => {
   const data = await fetchMutation(api.room.everyonePermission, { roomCode });
@@ -36,3 +33,4 @@ export const everyonePermissionAction = async ({roomCode}: {roomCode: number}) =
 export const adminsPermissionAction = async ({roomCode}: {roomCode: number}) => {
   const data = await fetchMutation(api.room.adminsPermission, {roomCode})
 };
+

@@ -83,3 +83,20 @@ export const getSongUrl = query({
     return await ctx.storage.getUrl(song.storageId);
   },
 });
+
+
+export const setRoomSongUrl = mutation({
+  args:{
+    roomCode: v.number(),
+    songUrl: v.string(),
+  },
+  handler: async(ctx, {roomCode, songUrl})=>{
+    const room = await ctx.db
+      .query("room")
+      .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
+      .unique();
+    if (!room) return console.error("Room not found!!");
+    await ctx.db.patch(room._id, { currentSong: songUrl,currentSongState: true });
+    return { success: true }; 
+  }
+})

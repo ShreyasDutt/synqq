@@ -1,4 +1,3 @@
-"use client"
 import MusicPlayer from "@/components/room/MusicPlayer";
 import RoomTabs from "@/components/room/RoomTabs";
 

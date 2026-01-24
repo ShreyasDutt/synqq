@@ -72,7 +72,8 @@ if (fullRoomData === undefined) {
 
                 <div className="flex-1">
                   <p className="text-md font-semibold">
-                    {room.room.currentSong ?? "No song playing"}
+                    {/* {room.room.currentSong ?? "No song playing"} */}
+                    No song playing
                   </p>
                   <p className="text-xs text-neutral-400">
                     {room.room.roomCode} {room.participants[0].city+" "+room.participants[0].region+" "+room.participants[0].country}
@@ -83,7 +84,7 @@ if (fullRoomData === undefined) {
                  <div className="flex -space-x-[0.6rem] items-center">
                     {(() => {
                       const maxFlags = 3;
-                      const seenCountries = new Set<string>();
+                      const seenCountries = new Set<string>();  
                       const uniqueParticipants: typeof room.participants = [];
 
                       // Pick participants with unique countries first

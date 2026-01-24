@@ -1,7 +1,7 @@
 "use client";
 
 import { joinRoomAction } from "@/app/actions/room.actions";
-import { createdRoomAtom, displayNameAtom, roomCodeAtom } from "@/atoms/atoms";
+import { audioEnabledAtom, createdRoomAtom, displayNameAtom, roomCodeAtom } from "@/atoms/atoms";
 import { roomDataAtom } from "@/atoms/convexQueriesAtoms";
 import { api } from "@/convex/_generated/api";
 import { generateRandomName } from "@/lib/generateName";
@@ -15,6 +15,7 @@ const JoinRoom = ({ recievedRoomCode }: { recievedRoomCode: string }) => {
   setRoomCode(roomCode);
   const [displayName, setDisplayName] = useAtom(displayNameAtom);
   const [createdRoom] = useAtom(createdRoomAtom);
+  const [enableAudio] = useAtom(audioEnabledAtom);
   const setRoomData = useSetAtom(roomDataAtom);
   const updateLastSeen = useMutation(api.room.UpdateLastSeen);
   const joinRoom = async () => {
@@ -30,7 +31,6 @@ const JoinRoom = ({ recievedRoomCode }: { recievedRoomCode: string }) => {
       }
     }
   };
-
   useEffect(() => {
     joinRoom();
   }, []);

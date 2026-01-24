@@ -9,15 +9,17 @@ import {
 } from "lucide-react";
 import { Progress } from "../ui/progress";
 import { useAtom } from "jotai";
-import { amIAdminAtom, roomDataAtom } from "@/atoms/convexQueriesAtoms";
+import { amIAdminAtom, CurrentPlayingSong, roomDataAtom } from "@/atoms/convexQueriesAtoms";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { roomCodeAtom } from "@/atoms/atoms";
+import AudioPlayer from "./Tabs/AudioPlayer";
 
 const MusicPlayer = () => {
   const [amIAdmin] = useAtom(amIAdminAtom);
   const [roomData] = useAtom(roomDataAtom);
   const [roomCode] = useAtom(roomCodeAtom);
+  const [currentPlayingSong, setCurrentPlayingSong] = useAtom(CurrentPlayingSong);
   if (!roomCode) {
     console.error("Room Code not found!!");
     return null;
@@ -52,10 +54,10 @@ const MusicPlayer = () => {
               value={roomData?.room.currentSongProgress || null}
               className="w-full"
             />
-            <p>03:45</p>
+            <p>{currentPlayingSong?.Duration || '00:00'}</p>
           </div>
         </div>
-
+       
         <div className="flex items-center gap-2 w-32">
           <Volume2 size={20} className="text-neutral-400" />
           <input
@@ -75,7 +77,9 @@ const MusicPlayer = () => {
           />
         </div>
       </div>
-
+        <div className="">
+          <AudioPlayer/>
+        </div>
       {/* Mobile Layout */}
       <div className="lg:hidden flex flex-col gap-3">
         <div className="flex items-center justify-center gap-6">
@@ -94,7 +98,8 @@ const MusicPlayer = () => {
             value={roomData?.room.currentSongProgress || null}
             className="w-full"
           />
-          <p>03:45</p>
+          <p>{currentPlayingSong?.Duration || '00:00'}</p>
+          
         </div>
       </div>
     </div>

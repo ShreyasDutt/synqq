@@ -29,7 +29,13 @@ type RoomData = {
   room: Room;
   participants: RoomParticipant[] ;
 };
+type CurrentPlayingSong = {
+  SongUrl: string;
+  Duration: string;
+}
 
 export const roomDataAtom = atom<RoomData | undefined | null>();
 
 export const amIAdminAtom = atom<boolean>(false);
+
+export const CurrentPlayingSong = atom<CurrentPlayingSong | null>(null);

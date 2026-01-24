@@ -10,6 +10,7 @@ import {
 import { AlertCircle } from "lucide-react";
 import RoomHeroSection from "@/components/room/RoomHeroSection";
 import JoinRoom from "@/components/room/JoinRoom";
+import RoomClientLayout from "@/components/room/StartListening";
 
 type Props={
   params: {
@@ -19,6 +20,7 @@ type Props={
 
 const page = async ({ params }: Props) => {
   const { roomCode } = await params;
+
 
   if (!roomCode || !/^\d{6}$/.test(roomCode)) {
     return (
@@ -42,9 +44,11 @@ const page = async ({ params }: Props) => {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <JoinRoom recievedRoomCode={roomCode} />
+      <RoomClientLayout>
       <TabNav/>
       <Roomsidebar />
       <RoomHeroSection />
+      </RoomClientLayout>
     </div>
   )
 }
