@@ -26,6 +26,7 @@ export default defineSchema({
     currentSongProgress: v.number(),
     playbackPermissions: v.string(), //admins or everyone
     globalVolume: v.number(), //1 to 100
+    updatedAt: v.optional(v.number()), //timestamp of last update to the room/song state
   }).index("byRoomCode", ["roomCode"]),
 
   message: defineTable({

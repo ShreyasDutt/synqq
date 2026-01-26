@@ -1,5 +1,6 @@
 "use client";
 import {
+  Pause,
   Play,
   Repeat,
   Shuffle,
@@ -12,19 +13,27 @@ import { useAtom } from "jotai";
 import { amIAdminAtom, CurrentPlayingSong, roomDataAtom } from "@/atoms/convexQueriesAtoms";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { roomCodeAtom } from "@/atoms/atoms";
+import { currentSongStateAtom, currentSongTimeAtom, roomCodeAtom } from "@/atoms/atoms";
 import AudioPlayer from "./Tabs/AudioPlayer";
+import formatTime from "@/lib/formatSongTime";
 
 const MusicPlayer = () => {
   const [amIAdmin] = useAtom(amIAdminAtom);
   const [roomData] = useAtom(roomDataAtom);
   const [roomCode] = useAtom(roomCodeAtom);
+  const [currentSongTime] = useAtom(currentSongTimeAtom)
+  const [currentSongState, setCurrentSongState] = useAtom(currentSongStateAtom);
   const [currentPlayingSong, setCurrentPlayingSong] = useAtom(CurrentPlayingSong);
   if (!roomCode) {
     console.error("Room Code not found!!");
     return null;
   }
   const changeVolume = useMutation(api.room.changeVolume);
+  const FlipSongState = useMutation(api.song.changeSongState);
+
+  const changeSongState = () => {
+    FlipSongState({roomCode})
+  }
   return (
     <div className="w-full">
       {/* Desktop Layout */}
@@ -38,10 +47,24 @@ const MusicPlayer = () => {
               size={17}
             />
             <SkipBack className="fill-neutral-300 text-neutral-300 cursor-pointer hover:fill-white hover:text-white transition-colors" />
-            <Play
+            {!roomData?.room.currentSongState ? (
+              <div>
+              <Play
+              onClick={changeSongState}
               className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
               size={20}
             />
+              </div>
+            ) : (
+              <div>
+                <Pause
+                 onClick={changeSongState}
+              className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+              size={20}
+                />
+              </div>
+            )}
+
             <SkipForward className="fill-neutral-300 text-neutral-300 cursor-pointer hover:fill-white hover:text-white transition-colors" />
             <Repeat
               className="text-neutral-400 cursor-pointer hover:text-white transition-colors"
@@ -49,7 +72,7 @@ const MusicPlayer = () => {
             />
           </div>
           <div className="flex items-center justify-between text-xs text-neutral-400 gap-2">
-            <p>00:00</p>
+            <p>{roomData?.room.currentSongProgress}</p>
             <Progress
               value={roomData?.room.currentSongProgress || null}
               className="w-full"
@@ -85,15 +108,28 @@ const MusicPlayer = () => {
         <div className="flex items-center justify-center gap-6">
           <Shuffle className="text-neutral-400" size={17} />
           <SkipBack className="fill-neutral-300 text-neutral-300" />
-          <Play
-            className="bg-white fill-black rounded-full w-12 h-12 p-2"
-            size={20}
-          />
+            {!roomData?.room.currentSongState ? (
+              <div>
+              <Play
+              onClick={changeSongState}
+              className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+              size={20}
+            />
+              </div>
+            ) : (
+              <div>
+                <Pause
+                 onClick={changeSongState}
+              className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+              size={20}
+                />
+              </div>
+            )}
           <SkipForward className="fill-neutral-300 text-neutral-300" />
           <Repeat className="text-neutral-400" size={17} />
         </div>
         <div className="flex items-center justify-between text-xs text-neutral-400 px-3 gap-2">
-          <p>00:00</p>
+          <p>{formatTime(roomData?.room.currentSongProgress)}</p>
           <Progress
             value={roomData?.room.currentSongProgress || null}
             className="w-full"

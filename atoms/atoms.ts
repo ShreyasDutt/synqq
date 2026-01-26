@@ -13,3 +13,5 @@ export const createdRoomAtom = atom<boolean>(false);
 export const roomTabAtom = atom<RoomTab>(RoomTab.MUSIC);
 
 export const audioEnabledAtom = atom<boolean>(false);
+export const currentSongTimeAtom = atom<number>(0);
+export const currentSongStateAtom = atom<boolean>(false);

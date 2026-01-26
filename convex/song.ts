@@ -100,3 +100,36 @@ export const setRoomSongUrl = mutation({
     return { success: true }; 
   }
 })
+
+export const FlipSongPlayState = mutation({
+  args:{
+    roomCode: v.number(),
+    currentSongTime: v.number(),
+    isPlaying: v.boolean(),
+  },
+  handler: async(ctx, {roomCode, currentSongTime, isPlaying})=>{
+    console.log("Current Song Time Backend : ",currentSongTime)
+    const room = await ctx.db
+      .query("room")
+      .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
+      .unique();
+    if (!room) return console.error("Room not found!!");
+    await ctx.db.patch(room._id, { currentSongProgress: currentSongTime, updatedAt: Date.now(), currentSongState: isPlaying });
+    return { success: true }; 
+  }
+})
+
+export const changeSongState = mutation({
+  args:{
+    roomCode: v.number()
+  },
+  handler: async(ctx, {roomCode})=>{
+    const room = await ctx.db
+      .query("room")
+      .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
+      .unique();
+    if (!room) return console.error("Room not found!!");
+    await ctx.db.patch(room._id, { currentSongState: !room.currentSongState });
+    return { success: true }; 
+  }
+})

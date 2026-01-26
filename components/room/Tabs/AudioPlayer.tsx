@@ -2,14 +2,21 @@
 
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { roomCodeAtom, audioEnabledAtom } from "@/atoms/atoms";
+import { roomCodeAtom, audioEnabledAtom, currentSongTimeAtom, currentSongStateAtom } from "@/atoms/atoms";
 
 export default function AudioPlayer() {
   const [roomCode] = useAtom(roomCodeAtom);
   const [audioEnabled] = useAtom(audioEnabledAtom);
+  const [currentSongState,] = useAtom(currentSongStateAtom);
+  const [, setCurrentSongTime] = useAtom(currentSongTimeAtom);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  if (!roomCode) {
+    console.error("Room Code not found!!");
+    return null;
+  }
 
   const roomData = useQuery(api.room.getRoomData, {
     roomCode: Number(roomCode),
@@ -17,6 +24,7 @@ export default function AudioPlayer() {
 
   const songUrl = roomData?.room.currentSong ?? null;
   const isPlaying = roomData?.room.currentSongState === true;
+  const flipSongState = useMutation(api.song.FlipSongPlayState);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -29,6 +37,9 @@ export default function AudioPlayer() {
 
     if (isPlaying) {
       const playPromise = audio.play();
+      console.log("Current Time : "+audio.currentTime)
+      setCurrentSongTime(audio.currentTime);
+      audio.currentTime = roomData?.room.currentSongProgress || 0;
       if (playPromise !== undefined) {
         playPromise.catch(() => {
           console.log("Autoplay blocked");
@@ -36,8 +47,46 @@ export default function AudioPlayer() {
       }
     } else {
       audio.pause();
+     console.log("Paused At : "+audio.currentTime)
+    setCurrentSongTime(audio.currentTime);
+        
+
     }
   }, [songUrl, isPlaying, audioEnabled]);
 
-  return <audio ref={audioRef} preload="auto" hidden />;
+
+   const handlePlay = () => {
+    const audio = audioRef.current!;
+    flipSongState({
+      roomCode,
+      isPlaying: true,
+      currentSongTime: audio.currentTime,
+    });
+  };
+
+  const handlePause = () => {
+    const audio = audioRef.current!;
+    flipSongState({
+      roomCode,
+      isPlaying: false,
+      currentSongTime: audio.currentTime,
+    });
+  };
+
+  const handleSeeked = () => {
+    const audio = audioRef.current!;
+    flipSongState({
+      roomCode,
+      isPlaying,
+      currentSongTime: audio.currentTime,
+    });
+    
+  };
+
+  return <audio ref={audioRef} 
+    preload="auto" 
+    controls  
+    onPlay={handlePlay}
+    onPause={handlePause}
+    onSeeked={handleSeeked} />;
 }
