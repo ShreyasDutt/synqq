@@ -1,5 +1,6 @@
 "use client";
-import { useQRCode} from "next-qrcode";
+
+import { useQRCode } from "next-qrcode";
 import {
   adminsPermissionAction,
   everyonePermissionAction,
@@ -15,10 +16,8 @@ import { useMutation } from "convex/react";
 import { useAtom } from "jotai";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -64,7 +63,7 @@ const SessionTab = () => {
     } else {
       adminsPermissionAction({ roomCode });
     }
-  }
+  };
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(roomUrl);
@@ -80,16 +79,18 @@ const SessionTab = () => {
 
   const changeVolume = useMutation(api.room.changeVolume);
   const [roomData] = useAtom(roomDataAtom);
+  const [amIAdmin, setAmIAdmin] = useAtom(amIAdminAtom);
   const [displayName] = useAtom(displayNameAtom);
 
-  const [amIAdmin, setAmIAdmin] = useAtom(amIAdminAtom);
   useEffect(() => {
     const check =
       roomData?.participants.find((p) => p.displayName === displayName)
         ?.role === "admin";
 
-    setAmIAdmin(!!check);
+    setAmIAdmin(check);
   }, [roomData?.participants, displayName]);
+
+  const myPlayPermission = amIAdmin || roomData?.room.playbackPermissions === "everyone";
 
   const [uploading, setUploading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -98,73 +99,71 @@ const SessionTab = () => {
   const makeAdminMutation = useMutation(api.room.makeAdmin);
   const removeAdminMutation = useMutation(api.room.removeAdmin);
 
-const uploadSong = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const input = e.currentTarget;
-  const file = input.files?.[0];
+  const uploadSong = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    const file = input.files?.[0];
 
-  const reset = () => {
-    input.value = "";
+    const reset = () => {
+      input.value = "";
+    };
+
+    if (!file) {
+      reset();
+      return;
+    }
+
+    if (!file.type.startsWith("audio/")) {
+      toast.warning("Only audio files are allowed");
+      reset();
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.warning("File size must be 50MB or less");
+      reset();
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const metadata = await parseBlob(file);
+      const duration = metadata.format.duration;
+
+      if (!duration) {
+        toast.warning("Duration not found");
+        return;
+      }
+
+      if (duration > MAX_DURATION) {
+        toast.warning("Audio must be 10 minutes or less");
+        return;
+      }
+
+      const postUrl = await generateUploadUrlMutation();
+
+      const result = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+
+      const { storageId } = await result.json();
+
+      await uploadSongMutation({
+        duration,
+        roomCode,
+        storageId,
+        title: file.name,
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload failed");
+    } finally {
+      setUploading(false);
+      reset();
+    }
   };
-
-  if (!file) {
-    reset();
-    return;
-  }
-
-  if (!file.type.startsWith("audio/")) {
-    toast.warning("Only audio files are allowed");
-    reset();
-    return;
-  }
-
-  if (file.size > MAX_FILE_SIZE) {
-    toast.warning("File size must be 50MB or less");
-    reset();
-    return;
-  }
-
-  setUploading(true);
-
-  try {
-    const metadata = await parseBlob(file);
-    const duration = metadata.format.duration;
-
-    if (!duration) {
-      toast.warning("Duration not found");
-      return;
-    }
-
-    if (duration > MAX_DURATION) {
-      toast.warning("Audio must be 10 minutes or less");
-      return;
-    }
-
-    const postUrl = await generateUploadUrlMutation();
-
-    const result = await fetch(postUrl, {
-      method: "POST",
-      headers: { "Content-Type": file.type },
-      body: file,
-    });
-
-    const { storageId } = await result.json();
-
-    await uploadSongMutation({
-      duration,
-      roomCode,
-      storageId,
-      title: file.name,
-    });
-  } catch (err) {
-    console.error(err);
-    toast.error("Upload failed");
-  } finally {
-    setUploading(false);
-    reset(); // <-- important
-  }
-};
-
-
 
   return (
     <div className="flex flex-col h-full">
@@ -270,14 +269,12 @@ const uploadSong = async (e: React.ChangeEvent<HTMLInputElement>) => {
             max="100"
             className={`w-full accent-foreground hover:accent-primary
             [&::-webkit-slider-thumb]:opacity-0
-             ${(amIAdmin || roomData?.room.playbackPermissions === "everyone") && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
+             ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
             value={roomData?.room.globalVolume ?? 75}
             onChange={(e) =>
               changeVolume({ roomCode, globalVolume: Number(e.target.value) })
             }
-            disabled={
-              !amIAdmin && !(roomData?.room.playbackPermissions === "everyone")
-            }
+            disabled={!myPlayPermission}
           />
 
           <p className="text-xs text-neutral-400">
@@ -369,18 +366,14 @@ const uploadSong = async (e: React.ChangeEvent<HTMLInputElement>) => {
       </div>
 
       <label
-        className={`flex items-center gap-3 py-2 px-3 border rounded-lg m-3 mt-auto ${(amIAdmin || roomData?.room.playbackPermissions === "everyone") && "hover:bg-muted-foreground/10 cursor-pointer "}`}
+        className={`flex items-center gap-3 py-2 px-3 border rounded-lg m-3 mt-auto ${myPlayPermission && "hover:bg-muted-foreground/10 cursor-pointer "}`}
       >
         <input
           type="file"
           className="hidden"
           accept="audio/*"
           onChange={uploadSong}
-          disabled={
-            (!amIAdmin &&
-              !(roomData?.room.playbackPermissions === "everyone")) ||
-            uploading
-          }
+          disabled={!myPlayPermission || uploading}
         />
         {uploading ? (
           <>
@@ -394,13 +387,13 @@ const uploadSong = async (e: React.ChangeEvent<HTMLInputElement>) => {
         ) : (
           <>
             <div
-              className={` p-2 rounded-lg ${!amIAdmin && !(roomData?.room.playbackPermissions === "everyone") ? "bg-gray-600/50" : "bg-primary"}`}
+              className={` p-2 rounded-lg ${!myPlayPermission ? "bg-gray-600/50" : "bg-primary"}`}
             >
               <Plus size={20} />
             </div>
             <div>
               <div
-                className={`text-sm ${!amIAdmin && !(roomData?.room.playbackPermissions === "everyone") ? "text-muted-foreground" : "text-foreground"}`}
+                className={`text-sm ${!myPlayPermission ? "text-muted-foreground" : "text-foreground"}`}
               >
                 Upload audio
               </div>

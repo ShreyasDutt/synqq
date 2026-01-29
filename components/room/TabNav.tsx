@@ -1,21 +1,26 @@
-import { Music } from 'lucide-react'
-import Link from 'next/link'
-import TabNavClient from './TabNavClient';
+import { Music } from "lucide-react";
+import TabNavClient from "./TabNavClient";
 
 const TabNav = () => {
   return (
     <div className="flex items-center justify-between px-4 py-2 md:py-2 text-xs text-neutral-400 lg:border-b ">
       <div className="flex items-center gap-5">
-        <Link href="/">
+        <a href="/">
           <div className="flex items-center gap-1 font-medium text-neutral-300 hover:text-neutral-400">
             <Music size={14} className="text-primary" />
             <span>Synq</span>
           </div>
-        </Link>
+        </a>
         <TabNavClient />
       </div>
 
-      <Link href="/" aria-label="GitHub repository">
+      <a
+        href="https://github.com/ShreyasDutt/synqq"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub repository"
+        className="inline-flex"
+      >
         <svg
           width="25"
           height="25"
@@ -52,9 +57,9 @@ const TabNav = () => {
                 0-3.59-2.91-6.5-6.5-6.5z"
           />
         </svg>
-      </Link>
+      </a>
     </div>
   );
-}
+};
 
-export default TabNav
+export default TabNav;

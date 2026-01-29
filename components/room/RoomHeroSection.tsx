@@ -1,9 +1,10 @@
+
 import MusicPlayer from "@/components/room/MusicPlayer";
 import RoomTabs from "@/components/room/RoomTabs";
 
 const RoomHeroSection = () => {
   return (
-      <>
+    <>
       <div className="flex-1 overflow-hidden">
         <RoomTabs />
       </div>

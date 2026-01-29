@@ -84,52 +84,74 @@ export const getSongUrl = query({
   },
 });
 
-
 export const setRoomSongUrl = mutation({
-  args:{
+  args: {
     roomCode: v.number(),
     songUrl: v.string(),
   },
-  handler: async(ctx, {roomCode, songUrl})=>{
+  handler: async (ctx, { roomCode, songUrl }) => {
     const room = await ctx.db
       .query("room")
       .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
       .unique();
     if (!room) return console.error("Room not found!!");
-    await ctx.db.patch(room._id, { currentSong: songUrl,currentSongState: true });
-    return { success: true }; 
-  }
-})
+    await ctx.db.patch(room._id, {
+      currentSong: songUrl,
+      currentSongState: true,
+    });
+    return { success: true };
+  },
+});
 
 export const FlipSongPlayState = mutation({
-  args:{
+  args: {
     roomCode: v.number(),
     currentSongTime: v.number(),
     isPlaying: v.boolean(),
   },
-  handler: async(ctx, {roomCode, currentSongTime, isPlaying})=>{
-    console.log("Current Song Time Backend : ",currentSongTime)
+  handler: async (ctx, { roomCode, currentSongTime, isPlaying }) => {
+    console.log("Current Song Time Backend : ", currentSongTime);
     const room = await ctx.db
       .query("room")
       .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
       .unique();
     if (!room) return console.error("Room not found!!");
-    await ctx.db.patch(room._id, { currentSongProgress: currentSongTime, updatedAt: Date.now(), currentSongState: isPlaying });
-    return { success: true }; 
-  }
-})
+    await ctx.db.patch(room._id, {
+      currentSongProgress: currentSongTime,
+      updatedAt: Date.now(),
+      currentSongState: isPlaying,
+    });
+    return { success: true };
+  },
+});
 
 export const changeSongState = mutation({
-  args:{
-    roomCode: v.number()
+  args: {
+    roomCode: v.number(),
   },
-  handler: async(ctx, {roomCode})=>{
+  handler: async (ctx, { roomCode }) => {
     const room = await ctx.db
       .query("room")
       .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
       .unique();
     if (!room) return console.error("Room not found!!");
     await ctx.db.patch(room._id, { currentSongState: !room.currentSongState });
-    return { success: true }; 
-  }
-})
+    return { success: true };
+  },
+});
+
+export const openDefaultTracks = mutation({
+  args: {
+    roomCode: v.number(),
+    setDefaultTracks: v.boolean()
+  },
+  handler: async (ctx, { roomCode, setDefaultTracks }) => {
+    const room = await ctx.db
+      .query("room")
+      .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
+      .unique();
+    if (!room) return console.error("Room not found!!");
+    await ctx.db.patch(room._id, { defaultTracks: setDefaultTracks });
+    return { success: true };
+  },
+});

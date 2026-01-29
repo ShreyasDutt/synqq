@@ -16,7 +16,7 @@ if (fullRoomData === undefined) {
     <div className="mb-2">
       <p className="uppercase text-gray-600 text-sm mb-2">playing now</p>
 
-      <div className="flex flex-col items-stretch gap-1">
+      <div className="flex flex-col-reverse items-stretch gap-1">
         {[...Array(2)].map((_, i) => (
           <div
             key={i}
@@ -56,7 +56,7 @@ if (fullRoomData === undefined) {
         </p>
       </Card>
     )}
-     <div className="flex flex-col items-stretch my-4">
+     <div className="flex flex-col-reverse items-stretch my-4">
         {fullRoomData.map((room,idx) => {
           return (
             <BlurFade key={room.room._id} delay={0.25 + idx * 0.40} >

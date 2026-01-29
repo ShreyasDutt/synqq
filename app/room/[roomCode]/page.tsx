@@ -1,4 +1,4 @@
-import TabNav from "@/components/room/Tabs/TabNav";
+import TabNav from "@/components/room/TabNav";
 import Roomsidebar from "@/components/room/Roomsidebar";
 import {
   Card,
@@ -12,15 +12,14 @@ import RoomHeroSection from "@/components/room/RoomHeroSection";
 import JoinRoom from "@/components/room/JoinRoom";
 import RoomClientLayout from "@/components/room/StartListening";
 
-type Props={
+type Props = {
   params: {
-    roomCode: string
-  }
-}
+    roomCode: string;
+  };
+};
 
 const page = async ({ params }: Props) => {
   const { roomCode } = await params;
-
 
   if (!roomCode || !/^\d{6}$/.test(roomCode)) {
     return (
@@ -36,7 +35,6 @@ const page = async ({ params }: Props) => {
             </CardDescription>
           </CardContent>
         </Card>
-
       </div>
     );
   }
@@ -45,12 +43,12 @@ const page = async ({ params }: Props) => {
     <div className="h-screen flex flex-col overflow-hidden">
       <JoinRoom recievedRoomCode={roomCode} />
       <RoomClientLayout>
-      <TabNav/>
-      <Roomsidebar />
-      <RoomHeroSection />
+        <TabNav />
+        <Roomsidebar />
+        <RoomHeroSection />
       </RoomClientLayout>
     </div>
-  )
-}
+  );
+};
 
 export default page;

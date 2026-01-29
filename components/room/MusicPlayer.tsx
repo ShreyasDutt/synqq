@@ -13,17 +13,16 @@ import { useAtom } from "jotai";
 import { amIAdminAtom, CurrentPlayingSong, roomDataAtom } from "@/atoms/convexQueriesAtoms";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { currentSongStateAtom, currentSongTimeAtom, roomCodeAtom } from "@/atoms/atoms";
-import AudioPlayer from "./Tabs/AudioPlayer";
+import { roomCodeAtom } from "@/atoms/atoms";
+import AudioPlayer from "./AudioPlayer";
 import formatTime from "@/lib/formatSongTime";
 
 const MusicPlayer = () => {
-  const [amIAdmin] = useAtom(amIAdminAtom);
   const [roomData] = useAtom(roomDataAtom);
   const [roomCode] = useAtom(roomCodeAtom);
-  const [currentSongTime] = useAtom(currentSongTimeAtom)
-  const [currentSongState, setCurrentSongState] = useAtom(currentSongStateAtom);
-  const [currentPlayingSong, setCurrentPlayingSong] = useAtom(CurrentPlayingSong);
+  const [amIAdmin] = useAtom(amIAdminAtom);
+  const myPlayPermission = amIAdmin || roomData?.room.playbackPermissions === "everyone";
+  const [currentPlayingSong] = useAtom(CurrentPlayingSong);
   if (!roomCode) {
     console.error("Room Code not found!!");
     return null;
@@ -32,8 +31,8 @@ const MusicPlayer = () => {
   const FlipSongState = useMutation(api.song.changeSongState);
 
   const changeSongState = () => {
-    FlipSongState({roomCode})
-  }
+    FlipSongState({ roomCode });
+  };
   return (
     <div className="w-full">
       {/* Desktop Layout */}
@@ -49,18 +48,18 @@ const MusicPlayer = () => {
             <SkipBack className="fill-neutral-300 text-neutral-300 cursor-pointer hover:fill-white hover:text-white transition-colors" />
             {!roomData?.room.currentSongState ? (
               <div>
-              <Play
-              onClick={changeSongState}
-              className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
-              size={20}
-            />
+                <Play
+                  onClick={changeSongState}
+                  className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+                  size={20}
+                />
               </div>
             ) : (
               <div>
                 <Pause
-                 onClick={changeSongState}
-              className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
-              size={20}
+                  onClick={changeSongState}
+                  className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+                  size={20}
                 />
               </div>
             )}
@@ -77,10 +76,10 @@ const MusicPlayer = () => {
               value={roomData?.room.currentSongProgress || null}
               className="w-full"
             />
-            <p>{currentPlayingSong?.Duration || '00:00'}</p>
+            <p>{currentPlayingSong?.Duration || "00:00"}</p>
           </div>
         </div>
-       
+
         <div className="flex items-center gap-2 w-32">
           <Volume2 size={20} className="text-neutral-400" />
           <input
@@ -89,42 +88,40 @@ const MusicPlayer = () => {
             max="100"
             className={`w-full accent-foreground hover:accent-primary
             [&::-webkit-slider-thumb]:opacity-0
-             ${(amIAdmin || (roomData?.room.playbackPermissions === "everyone")) && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
+             ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
             value={roomData?.room.globalVolume ?? 75}
             onChange={(e) =>
               changeVolume({ roomCode, globalVolume: Number(e.target.value) })
             }
-            disabled={
-              !amIAdmin && !(roomData?.room.playbackPermissions === "everyone")
-            }
+            disabled={!myPlayPermission}
           />
         </div>
       </div>
-        <div className="">
-          <AudioPlayer/>
-        </div>
+      <div className="">
+        <AudioPlayer />
+      </div>
       {/* Mobile Layout */}
       <div className="lg:hidden flex flex-col gap-3">
         <div className="flex items-center justify-center gap-6">
           <Shuffle className="text-neutral-400" size={17} />
           <SkipBack className="fill-neutral-300 text-neutral-300" />
-            {!roomData?.room.currentSongState ? (
-              <div>
+          {!roomData?.room.currentSongState ? (
+            <div>
               <Play
-              onClick={changeSongState}
-              className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
-              size={20}
-            />
-              </div>
-            ) : (
-              <div>
-                <Pause
-                 onClick={changeSongState}
-              className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
-              size={20}
-                />
-              </div>
-            )}
+                onClick={changeSongState}
+                className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+                size={20}
+              />
+            </div>
+          ) : (
+            <div>
+              <Pause
+                onClick={changeSongState}
+                className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+                size={20}
+              />
+            </div>
+          )}
           <SkipForward className="fill-neutral-300 text-neutral-300" />
           <Repeat className="text-neutral-400" size={17} />
         </div>
@@ -134,8 +131,7 @@ const MusicPlayer = () => {
             value={roomData?.room.currentSongProgress || null}
             className="w-full"
           />
-          <p>{currentPlayingSong?.Duration || '00:00'}</p>
-          
+          <p>{currentPlayingSong?.Duration || "00:00"}</p>
         </div>
       </div>
     </div>

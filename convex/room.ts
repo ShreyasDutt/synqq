@@ -44,6 +44,7 @@ const createRoomInternal = async ({
     currentSongProgress: 0.0,
     playbackPermissions: "admins",
     globalVolume: 75,
+    defaultTracks: false
   });
 
   await ctx.db.insert("participant", {

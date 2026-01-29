@@ -4,12 +4,15 @@ import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { roomCodeAtom, audioEnabledAtom, currentSongTimeAtom, currentSongStateAtom } from "@/atoms/atoms";
+import {
+  roomCodeAtom,
+  audioEnabledAtom,
+  currentSongTimeAtom,
+} from "@/atoms/atoms";
 
 export default function AudioPlayer() {
   const [roomCode] = useAtom(roomCodeAtom);
   const [audioEnabled] = useAtom(audioEnabledAtom);
-  const [currentSongState,] = useAtom(currentSongStateAtom);
   const [, setCurrentSongTime] = useAtom(currentSongTimeAtom);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -28,7 +31,7 @@ export default function AudioPlayer() {
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !songUrl || !audioEnabled) return; 
+    if (!audio || !songUrl || !audioEnabled) return;
 
     if (audio.src !== songUrl) {
       audio.src = songUrl;
@@ -37,7 +40,7 @@ export default function AudioPlayer() {
 
     if (isPlaying) {
       const playPromise = audio.play();
-      console.log("Current Time : "+audio.currentTime)
+      console.log("Current Time : " + audio.currentTime);
       setCurrentSongTime(audio.currentTime);
       audio.currentTime = roomData?.room.currentSongProgress || 0;
       if (playPromise !== undefined) {
@@ -47,15 +50,12 @@ export default function AudioPlayer() {
       }
     } else {
       audio.pause();
-     console.log("Paused At : "+audio.currentTime)
-    setCurrentSongTime(audio.currentTime);
-        
-
+      console.log("Paused At : " + audio.currentTime);
+      setCurrentSongTime(audio.currentTime);
     }
   }, [songUrl, isPlaying, audioEnabled]);
 
-
-   const handlePlay = () => {
+  const handlePlay = () => {
     const audio = audioRef.current!;
     flipSongState({
       roomCode,
@@ -80,13 +80,16 @@ export default function AudioPlayer() {
       isPlaying,
       currentSongTime: audio.currentTime,
     });
-    
   };
 
-  return <audio ref={audioRef} 
-    preload="auto" 
-    controls  
-    onPlay={handlePlay}
-    onPause={handlePause}
-    onSeeked={handleSeeked} />;
+  return (
+    <audio
+      ref={audioRef}
+      preload="auto"
+      controls
+      onPlay={handlePlay}
+      onPause={handlePause}
+      onSeeked={handleSeeked}
+    />
+  );
 }

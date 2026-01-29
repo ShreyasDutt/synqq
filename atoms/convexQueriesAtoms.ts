@@ -13,6 +13,7 @@ type Room = {
   currentSongProgress: number;
   playbackPermissions: string,
   globalVolume: number;
+  defaultTracks: boolean;
 };
 
 type RoomParticipant = {
