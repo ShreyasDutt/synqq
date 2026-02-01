@@ -10,7 +10,11 @@ import {
 } from "lucide-react";
 import { Progress } from "../ui/progress";
 import { useAtom } from "jotai";
-import { amIAdminAtom, CurrentPlayingSong, roomDataAtom } from "@/atoms/convexQueriesAtoms";
+import {
+  amIAdminAtom,
+  CurrentPlayingSong,
+  roomDataAtom,
+} from "@/atoms/convexQueriesAtoms";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { roomCodeAtom } from "@/atoms/atoms";
@@ -18,15 +22,18 @@ import AudioPlayer from "./AudioPlayer";
 import formatTime from "@/lib/formatSongTime";
 
 const MusicPlayer = () => {
-  const [roomData] = useAtom(roomDataAtom);
   const [roomCode] = useAtom(roomCodeAtom);
-  const [amIAdmin] = useAtom(amIAdminAtom);
-  const myPlayPermission = amIAdmin || roomData?.room.playbackPermissions === "everyone";
-  const [currentPlayingSong] = useAtom(CurrentPlayingSong);
   if (!roomCode) {
     console.error("Room Code not found!!");
     return null;
   }
+  const [roomData] = useAtom(roomDataAtom);
+  const [amIAdmin] = useAtom(amIAdminAtom);
+  const myPlayPermission =
+    amIAdmin || roomData?.room.playbackPermissions === "everyone";
+  const [currentPlayingSong] = useAtom(CurrentPlayingSong);
+  console.log("current playing song: ",currentPlayingSong)
+  
   const changeVolume = useMutation(api.room.changeVolume);
   const FlipSongState = useMutation(api.song.changeSongState);
 
@@ -42,39 +49,72 @@ const MusicPlayer = () => {
         <div className="flex-1 flex flex-col gap-3 max-w-2xl">
           <div className="flex items-center justify-center gap-6">
             <Shuffle
-              className="text-neutral-400 cursor-pointer hover:text-white transition-colors"
+              className={`${!myPlayPermission ? "text-muted-foreground/70" : "text-neutral-400 hover:text-white cursor-pointer"} transition-colors`}
               size={17}
+              onClick={() => {
+                if (myPlayPermission) {
+                }
+              }}
             />
-            <SkipBack className="fill-neutral-300 text-neutral-300 cursor-pointer hover:fill-white hover:text-white transition-colors" />
+            <SkipBack
+              className={`${!myPlayPermission ? "fill-muted-foreground/70 text-muted-foreground/70" : "fill-neutral-300 text-neutral-300 cursor-pointer hover:fill-white hover:text-white"} transition-colors`}
+              onClick={() => {
+                if (myPlayPermission) {
+                }
+              }}
+            />
             {!roomData?.room.currentSongState ? (
               <div>
                 <Play
-                  onClick={changeSongState}
-                  className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+                  onClick={() => {
+                    if (myPlayPermission) changeSongState();
+                  }}
+                  className={`${!myPlayPermission ? "bg-muted-foreground/70 text-foreground/60" : "bg-white fill-black cursor-pointer hover:scale-105"} rounded-full w-10 h-10 p-2 transition-transform`}
                   size={20}
                 />
               </div>
             ) : (
               <div>
                 <Pause
-                  onClick={changeSongState}
-                  className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+                  onClick={() => {
+                    if (myPlayPermission) changeSongState();
+                  }}
+                  className={`${!myPlayPermission ? "bg-muted-foreground/70 " : "bg-white fill-black cursor-pointer hover:scale-105"} rounded-full w-10 h-10 p-2 transition-transform`}
                   size={20}
                 />
               </div>
             )}
 
-            <SkipForward className="fill-neutral-300 text-neutral-300 cursor-pointer hover:fill-white hover:text-white transition-colors" />
+            <SkipForward
+              className={`${!myPlayPermission ? "fill-muted-foreground/70 text-muted-foreground/70" : "fill-neutral-300 text-neutral-300 cursor-pointer hover:fill-white hover:text-white"} transition-colors`}
+              onClick={() => {
+                if (myPlayPermission) {
+                }
+              }}
+            />
             <Repeat
-              className="text-neutral-400 cursor-pointer hover:text-white transition-colors"
+              className={`${!myPlayPermission ? "text-muted-foreground/70" : "text-neutral-400 hover:text-white cursor-pointer"} transition-colors`}
               size={17}
+              onClick={() => {
+                if (myPlayPermission) {
+                }
+              }}
             />
           </div>
           <div className="flex items-center justify-between text-xs text-neutral-400 gap-2">
-            <p>{roomData?.room.currentSongProgress}</p>
-            <Progress
-              value={roomData?.room.currentSongProgress || null}
-              className="w-full"
+            <p>{roomData?.room.currentSongProgress || "00:00"}</p>
+            <input
+              type="range"
+              min="0"
+              max={currentPlayingSong?.Duration || 100}
+              className={`w-full accent-foreground hover:accent-primary
+            [&::-webkit-slider-thumb]:opacity-0
+             ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
+              value={currentPlayingSong?.Duration || 0}
+              // onChange={(e) =>
+
+              // }
+              disabled={!myPlayPermission}
             />
             <p>{currentPlayingSong?.Duration || "00:00"}</p>
           </div>
@@ -103,33 +143,72 @@ const MusicPlayer = () => {
       {/* Mobile Layout */}
       <div className="lg:hidden flex flex-col gap-3">
         <div className="flex items-center justify-center gap-6">
-          <Shuffle className="text-neutral-400" size={17} />
-          <SkipBack className="fill-neutral-300 text-neutral-300" />
+          <Shuffle
+            className={`${!myPlayPermission ? "text-muted-foreground/70" : "text-neutral-400"}`}
+            size={17}
+            onClick={() => {
+              if (myPlayPermission) {
+              }
+            }}
+          />
+          <SkipBack
+            className={`${!myPlayPermission ? "fill-muted-foreground/70 text-muted-foreground/70" : "fill-neutral-300 text-neutral-300"}`}
+            onClick={() => {
+              if (myPlayPermission) {
+              }
+            }}
+          />
           {!roomData?.room.currentSongState ? (
             <div>
               <Play
-                onClick={changeSongState}
-                className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+                onClick={() => {
+                  if (myPlayPermission) changeSongState();
+                }}
+                className={`${!myPlayPermission ? "bg-muted-foreground/70 " : "bg-white fill-black"} rounded-full w-10 h-10 p-2 transition-transform`}
                 size={20}
               />
             </div>
           ) : (
             <div>
               <Pause
-                onClick={changeSongState}
-                className="bg-white fill-black rounded-full w-10 h-10 p-2 cursor-pointer hover:scale-105 transition-transform"
+                onClick={() => {
+                  if (myPlayPermission) changeSongState();
+                }}
+                className={`${!myPlayPermission ? "bg-muted-foreground/70" : "bg-white fill-black"} rounded-full w-10 h-10 p-2 transition-transform`}
                 size={20}
               />
             </div>
           )}
-          <SkipForward className="fill-neutral-300 text-neutral-300" />
-          <Repeat className="text-neutral-400" size={17} />
+          <SkipForward
+            className={`${!myPlayPermission ? "fill-muted-foreground/70 text-muted-foreground/70" : "fill-neutral-300 text-neutral-300"}`}
+            onClick={() => {
+              if (myPlayPermission) {
+              }
+            }}
+          />
+          <Repeat
+            className={`${!myPlayPermission ? "text-muted-foreground/70" : "text-neutral-400"}`}
+            size={17}
+            onClick={() => {
+              if (myPlayPermission) {
+              }
+            }}
+          />
         </div>
         <div className="flex items-center justify-between text-xs text-neutral-400 px-3 gap-2">
           <p>{formatTime(roomData?.room.currentSongProgress)}</p>
-          <Progress
-            value={roomData?.room.currentSongProgress || null}
-            className="w-full"
+          <input
+            type="range"
+            min="0"
+            max={currentPlayingSong?.Duration || 100}
+            className={`w-full accent-foreground hover:accent-primary
+            [&::-webkit-slider-thumb]:opacity-0
+             ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
+            value={currentPlayingSong?.Duration || 0}
+            // onChange={(e) =>
+
+            // }
+            disabled={!myPlayPermission}
           />
           <p>{currentPlayingSong?.Duration || "00:00"}</p>
         </div>

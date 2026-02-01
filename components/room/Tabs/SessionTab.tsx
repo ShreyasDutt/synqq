@@ -387,7 +387,7 @@ const SessionTab = () => {
         ) : (
           <>
             <div
-              className={` p-2 rounded-lg ${!myPlayPermission ? "bg-gray-600/50" : "bg-primary"}`}
+              className={`p-2 rounded-lg ${!myPlayPermission ? "bg-muted-foreground/50" : "bg-primary"}`}
             >
               <Plus size={20} />
             </div>
