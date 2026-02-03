@@ -8,8 +8,7 @@ import {
   SkipForward,
   Volume2,
 } from "lucide-react";
-import { Progress } from "../ui/progress";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import {
   amIAdminAtom,
   CurrentPlayingSong,
@@ -20,6 +19,7 @@ import { api } from "@/convex/_generated/api";
 import { roomCodeAtom } from "@/atoms/atoms";
 import AudioPlayer from "./AudioPlayer";
 import formatTime from "@/lib/formatSongTime";
+import { playNextSongAtom, playPreviousSongAtom } from "@/atoms/song";
 
 const MusicPlayer = () => {
   const [roomCode] = useAtom(roomCodeAtom);
@@ -32,7 +32,8 @@ const MusicPlayer = () => {
   const myPlayPermission =
     amIAdmin || roomData?.room.playbackPermissions === "everyone";
   const [currentPlayingSong] = useAtom(CurrentPlayingSong);
-  console.log("current playing song: ",currentPlayingSong)
+  const setPlayNextSong = useSetAtom(playNextSongAtom);
+  const setPlayPreviousSong = useSetAtom(playPreviousSongAtom);
   
   const changeVolume = useMutation(api.room.changeVolume);
   const FlipSongState = useMutation(api.song.changeSongState);
@@ -60,6 +61,7 @@ const MusicPlayer = () => {
               className={`${!myPlayPermission ? "fill-muted-foreground/70 text-muted-foreground/70" : "fill-neutral-300 text-neutral-300 cursor-pointer hover:fill-white hover:text-white"} transition-colors`}
               onClick={() => {
                 if (myPlayPermission) {
+                  setPlayPreviousSong(true);
                 }
               }}
             />
@@ -69,7 +71,7 @@ const MusicPlayer = () => {
                   onClick={() => {
                     if (myPlayPermission) changeSongState();
                   }}
-                  className={`${!myPlayPermission ? "bg-muted-foreground/70 text-foreground/60" : "bg-white fill-black cursor-pointer hover:scale-105"} rounded-full w-10 h-10 p-2 transition-transform`}
+                  className={`${!myPlayPermission ? "bg-muted-foreground/70 text-muted-foreground/70" : "bg-white fill-black cursor-pointer hover:scale-105"} rounded-full w-10 h-10 p-2 transition-transform`}
                   size={20}
                 />
               </div>
@@ -79,7 +81,7 @@ const MusicPlayer = () => {
                   onClick={() => {
                     if (myPlayPermission) changeSongState();
                   }}
-                  className={`${!myPlayPermission ? "bg-muted-foreground/70 " : "bg-white fill-black cursor-pointer hover:scale-105"} rounded-full w-10 h-10 p-2 transition-transform`}
+                  className={`${!myPlayPermission ? "bg-muted-foreground/70 text-muted-foreground/70" : "bg-white fill-black cursor-pointer hover:scale-105"} rounded-full w-10 h-10 p-2 transition-transform`}
                   size={20}
                 />
               </div>
@@ -89,6 +91,7 @@ const MusicPlayer = () => {
               className={`${!myPlayPermission ? "fill-muted-foreground/70 text-muted-foreground/70" : "fill-neutral-300 text-neutral-300 cursor-pointer hover:fill-white hover:text-white"} transition-colors`}
               onClick={() => {
                 if (myPlayPermission) {
+                  setPlayNextSong(true);
                 }
               }}
             />
@@ -106,7 +109,7 @@ const MusicPlayer = () => {
             <input
               type="range"
               min="0"
-              max={currentPlayingSong?.Duration || 100}
+              max="100"
               className={`w-full accent-foreground hover:accent-primary
             [&::-webkit-slider-thumb]:opacity-0
              ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
@@ -116,7 +119,7 @@ const MusicPlayer = () => {
               // }
               disabled={!myPlayPermission}
             />
-            <p>{currentPlayingSong?.Duration || "00:00"}</p>
+            <p>{currentPlayingSong?.Duration}</p>
           </div>
         </div>
 
@@ -155,6 +158,7 @@ const MusicPlayer = () => {
             className={`${!myPlayPermission ? "fill-muted-foreground/70 text-muted-foreground/70" : "fill-neutral-300 text-neutral-300"}`}
             onClick={() => {
               if (myPlayPermission) {
+                setPlayPreviousSong(true);
               }
             }}
           />
@@ -164,7 +168,7 @@ const MusicPlayer = () => {
                 onClick={() => {
                   if (myPlayPermission) changeSongState();
                 }}
-                className={`${!myPlayPermission ? "bg-muted-foreground/70 " : "bg-white fill-black"} rounded-full w-10 h-10 p-2 transition-transform`}
+                className={`${!myPlayPermission ? "bg-muted-foreground/70 text-muted-foreground/70" : "bg-white fill-black"} rounded-full w-10 h-10 p-2 transition-transform`}
                 size={20}
               />
             </div>
@@ -174,7 +178,7 @@ const MusicPlayer = () => {
                 onClick={() => {
                   if (myPlayPermission) changeSongState();
                 }}
-                className={`${!myPlayPermission ? "bg-muted-foreground/70" : "bg-white fill-black"} rounded-full w-10 h-10 p-2 transition-transform`}
+                className={`${!myPlayPermission ? "bg-muted-foreground/70 text-muted-foreground/70" : "bg-white fill-black"} rounded-full w-10 h-10 p-2 transition-transform`}
                 size={20}
               />
             </div>
@@ -183,6 +187,7 @@ const MusicPlayer = () => {
             className={`${!myPlayPermission ? "fill-muted-foreground/70 text-muted-foreground/70" : "fill-neutral-300 text-neutral-300"}`}
             onClick={() => {
               if (myPlayPermission) {
+                setPlayNextSong(true);
               }
             }}
           />

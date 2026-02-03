@@ -7,7 +7,7 @@ export default defineSchema({
     country: v.string(),
     region: v.string(),
     city: v.string(),
-    roomId: v.id('room'),
+    roomId: v.id("room"),
     role: v.string(), //admin or user
     joinedAt: v.number(),
     lastSeen: v.number(),
@@ -21,6 +21,7 @@ export default defineSchema({
     createdAt: v.number(),
     songsQueue: v.optional(v.array(v.string())),
     currentSong: v.optional(v.string()),
+    currentSongUrl: v.optional(v.string()),
     currentSongState: v.boolean(), //default set to false
     currentLoopState: v.string(), //album or song or none
     currentSongProgress: v.number(),
@@ -31,16 +32,16 @@ export default defineSchema({
   }).index("byRoomCode", ["roomCode"]),
 
   message: defineTable({
-    roomId: v.id('room'),
+    roomId: v.id("room"),
     sendBy: v.string(), //displayName of the user
     createdAt: v.number(),
     content: v.string(),
   }).index("byRoomId", ["roomId"]),
 
   song: defineTable({
-    roomId: v.id('room'),
+    roomId: v.id("room"),
     title: v.string(),
     duration: v.number(),
-    storageId: v.id('_storage')
+    storageId: v.id("_storage"),
   }).index("byRoomId", ["roomId"]),
 });

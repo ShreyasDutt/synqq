@@ -6,12 +6,13 @@ type Room = {
   _creationTime: number;
   songsQueue?: string[];
   currentSong?: string;
+  currentSongUrl?: string;
   roomCode: number;
   createdAt: number;
   currentSongState: boolean;
   currentLoopState: string;
   currentSongProgress: number;
-  playbackPermissions: string,
+  playbackPermissions: string;
   globalVolume: number;
   defaultTracks: boolean;
 };

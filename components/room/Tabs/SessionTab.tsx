@@ -44,6 +44,7 @@ import {
 import { parseBlob } from "music-metadata";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { uploadingAudioAtom } from "@/atoms/song";
 
 const SessionTab = () => {
   const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
@@ -90,9 +91,10 @@ const SessionTab = () => {
     setAmIAdmin(check);
   }, [roomData?.participants, displayName]);
 
-  const myPlayPermission = amIAdmin || roomData?.room.playbackPermissions === "everyone";
+  const myPlayPermission =
+    amIAdmin || roomData?.room.playbackPermissions === "everyone";
 
-  const [uploading, setUploading] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useAtom(uploadingAudioAtom);
   const [copied, setCopied] = useState(false);
   const generateUploadUrlMutation = useMutation(api.song.generateUploadUrl);
   const uploadSongMutation = useMutation(api.song.uploadSong);
@@ -101,66 +103,65 @@ const SessionTab = () => {
 
   const uploadSong = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.currentTarget;
-    const file = input.files?.[0];
+    const files = Array.from(input.files ?? []);
 
     const reset = () => {
       input.value = "";
     };
-
-    if (!file) {
+    if (files.length === 0) {
+      reset();
+      return;
+    } else if (files.length > 5) {
+      toast.warning("You can upload a maximum of 5 audio files at once.");
       reset();
       return;
     }
-
-    if (!file.type.startsWith("audio/")) {
-      toast.warning("Only audio files are allowed");
-      reset();
-      return;
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      toast.warning("File size must be 50MB or less");
-      reset();
-      return;
-    }
-
-    setUploading(true);
-
+    setUploadingAudio(true);
     try {
-      const metadata = await parseBlob(file);
-      const duration = metadata.format.duration;
+      for (const file of files) {
+        if (!file.type.startsWith("audio/")) {
+          toast.warning("Only audio files are allowed");
+          reset();
+          return;
+        }
+        if (file.size > MAX_FILE_SIZE) {
+          toast.warning("File size must be 50MB or less");
+          reset();
+          return;
+        }
 
-      if (!duration) {
-        toast.warning("Duration not found");
-        return;
+        const metadata = await parseBlob(file);
+        const duration = metadata.format.duration;
+
+        if (!duration) {
+          toast.warning("Duration not found");
+          return;
+        }
+        if (duration > MAX_DURATION) {
+          toast.warning("Audio must be 10 minutes or less");
+          return;
+        }
+        const postUrl = await generateUploadUrlMutation();
+
+        const result = await fetch(postUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+
+        const { storageId } = await result.json();
+        await uploadSongMutation({
+          duration,
+          roomCode,
+          storageId,
+          title: file.name,
+        });
       }
-
-      if (duration > MAX_DURATION) {
-        toast.warning("Audio must be 10 minutes or less");
-        return;
-      }
-
-      const postUrl = await generateUploadUrlMutation();
-
-      const result = await fetch(postUrl, {
-        method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-
-      const { storageId } = await result.json();
-
-      await uploadSongMutation({
-        duration,
-        roomCode,
-        storageId,
-        title: file.name,
-      });
     } catch (err) {
       console.error(err);
       toast.error("Upload failed");
     } finally {
-      setUploading(false);
+      setUploadingAudio(false);
       reset();
     }
   };
@@ -373,9 +374,10 @@ const SessionTab = () => {
           className="hidden"
           accept="audio/*"
           onChange={uploadSong}
-          disabled={!myPlayPermission || uploading}
+          multiple
+          disabled={!myPlayPermission || uploadingAudio}
         />
-        {uploading ? (
+        {uploadingAudio ? (
           <>
             <>
               <div className="bg-primary p-2 rounded-lg">

@@ -88,15 +88,17 @@ export const setRoomSongUrl = mutation({
   args: {
     roomCode: v.number(),
     songUrl: v.string(),
+    songId: v.string(),
   },
-  handler: async (ctx, { roomCode, songUrl }) => {
+  handler: async (ctx, { roomCode, songId, songUrl }) => {
     const room = await ctx.db
       .query("room")
       .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
       .unique();
     if (!room) return console.error("Room not found!!");
     await ctx.db.patch(room._id, {
-      currentSong: songUrl,
+      currentSong: songId,
+      currentSongUrl: songUrl,
       currentSongState: true,
     });
     return { success: true };

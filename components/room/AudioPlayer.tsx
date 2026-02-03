@@ -25,7 +25,7 @@ export default function AudioPlayer() {
     roomCode: Number(roomCode),
   });
 
-  const songUrl = roomData?.room.currentSong ?? null;
+  const songUrl = roomData?.room.currentSongUrl ?? null;
   const isPlaying = roomData?.room.currentSongState === true;
   const flipSongState = useMutation(api.song.FlipSongPlayState);
 
@@ -54,6 +54,14 @@ export default function AudioPlayer() {
       setCurrentSongTime(audio.currentTime);
     }
   }, [songUrl, isPlaying, audioEnabled]);
+
+useEffect(() => {
+  if (!audioRef.current || roomData?.room.globalVolume == null) return;
+
+  const normalizedVolume = roomData.room.globalVolume / 100;
+  audioRef.current.volume = Math.max(0, Math.min(1, normalizedVolume));
+}, [roomData?.room.globalVolume]);
+  
 
   const handlePlay = () => {
     const audio = audioRef.current!;
@@ -86,10 +94,12 @@ export default function AudioPlayer() {
     <audio
       ref={audioRef}
       preload="auto"
+      // hidden
       controls
       onPlay={handlePlay}
       onPause={handlePause}
       onSeeked={handleSeeked}
+      
     />
   );
 }
