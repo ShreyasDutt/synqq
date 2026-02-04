@@ -6,12 +6,18 @@ import {
   CurrentPlayingSong,
   roomDataAtom,
 } from "@/atoms/convexQueriesAtoms";
-import { playNextSongAtom, playPreviousSongAtom, uploadingAudioAtom } from "@/atoms/song";
+import {
+  playNextSongAtom,
+  playPreviousSongAtom,
+  songEndsAtom,
+  uploadingAudioAtom,
+} from "@/atoms/song";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import formatTime from "@/lib/formatSongTime";
 import { useMutation, useQuery } from "convex/react";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { AudioLines, Minus, Play, Trash } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 
@@ -31,11 +37,11 @@ const MusicTab = () => {
   const [amIAdmin] = useAtom(amIAdminAtom);
   const myPlayPermission =
     amIAdmin || roomData?.room.playbackPermissions === "everyone";
-  const [, setCurrentPlayingSong] = useAtom(CurrentPlayingSong);
+  const setCurrentPlayingSong = useSetAtom(CurrentPlayingSong);
   const [uploadingAudio] = useAtom(uploadingAudioAtom);
   const [playNextSong, setPlayNextSong] = useAtom(playNextSongAtom);
   const [playPreviousSong, setPlayPreviousSong] = useAtom(playPreviousSongAtom);
-  
+  const [songEnds, setSongEnds] = useAtom(songEndsAtom);
   const [currentSongId, setcurrentSongId] = useState<Id<"song"> | null>(null);
   const [defaultCurrentSongUrl, setDefaultCurrentSongUrl] = useState<
     string | null
@@ -50,7 +56,6 @@ const MusicTab = () => {
   const [defaultSongs, setDefaultSongs] = useState<Song[]>([]);
 
   const songsList = useQuery(api.song.getSongs, { roomCode });
-  console.log("song;list: ", songsList);
 
   const SongUrl = useQuery(
     api.song.getSongUrl,
@@ -63,16 +68,143 @@ const MusicTab = () => {
 
   const playNextSongFunction = () => {
     const currentPlayingSong = roomData?.room.currentSong;
-    if (!currentPlayingSong) return;
+    if (!currentPlayingSong || !songsList) return;
 
-    const currentSongIndex = songsList?.findIndex(song => song._id === currentPlayingSong);
-    console.log({ currentSongIndex });
+    let currentSongIndex = songsList?.findIndex(
+      (song) => song._id === currentPlayingSong,
+    );
 
-  }
+    // default tracks
+    if (currentSongIndex === -1 && roomData.room.defaultTracks) {
+      currentSongIndex = defaultSongs?.findIndex(
+        (song) => `default-${song.name}` === currentPlayingSong,
+      );
+      if (currentSongIndex + 1 === defaultSongs.length) {
+        if (songsList.length > 0) {
+          setcurrentSongId(songsList[0]._id);
+          setcurrentSongDuration(formatTime(songsList[0].duration));
+          setCurrentSongUpdate(true);
+          return;
+        }
+        setDefaultCurrentSongId(`default-${defaultSongs[0].name}`);
+        setDefaultCurrentSongUrl(defaultSongs[0].url);
+        setcurrentSongDuration(defaultSongs[0].duration);
+        setDefaultCurrentSongUpdate(true);
+        return;
+      } else {
+        setDefaultCurrentSongId(
+          `default-${defaultSongs[currentSongIndex + 1].name}`,
+        );
+        setDefaultCurrentSongUrl(defaultSongs[currentSongIndex + 1].url);
+        setcurrentSongDuration(defaultSongs[currentSongIndex + 1].duration);
+        setDefaultCurrentSongUpdate(true);
+        return;
+      }
+    }
+
+    // my songs
+    if (currentSongIndex + 1 === songsList.length) {
+      if (roomData.room.defaultTracks) {
+        setDefaultCurrentSongId(`default-${defaultSongs[0].name}`);
+        setDefaultCurrentSongUrl(defaultSongs[0].url);
+        setcurrentSongDuration(defaultSongs[0].duration);
+        setDefaultCurrentSongUpdate(true);
+        return;
+      }
+      setcurrentSongId(songsList[0]._id);
+      setcurrentSongDuration(formatTime(songsList[0].duration));
+    } else {
+      setcurrentSongId(songsList[currentSongIndex + 1]._id);
+      setcurrentSongDuration(
+        formatTime(songsList[currentSongIndex + 1].duration),
+      );
+    }
+    setCurrentSongUpdate(true);
+  };
+  const playPreviousSongFunction = () => {
+    const currentPlayingSong = roomData?.room.currentSong;
+    if (!currentPlayingSong || !songsList) return;
+
+    let currentSongIndex = songsList?.findIndex(
+      (song) => song._id === currentPlayingSong,
+    );
+
+    // default tracks
+    if (currentSongIndex === -1 && roomData.room.defaultTracks) {
+      currentSongIndex = defaultSongs?.findIndex(
+        (song) => `default-${song.name}` === currentPlayingSong,
+      );
+      if (currentSongIndex === 0) {
+        if (songsList.length > 0) {
+          setcurrentSongId(songsList[songsList.length - 1]._id);
+          setcurrentSongDuration(
+            formatTime(songsList[songsList.length - 1].duration),
+          );
+          setCurrentSongUpdate(true);
+          return;
+        }
+
+        setDefaultCurrentSongId(
+          `default-${defaultSongs[defaultSongs.length - 1].name}`,
+        );
+        setDefaultCurrentSongUrl(defaultSongs[defaultSongs.length - 1].url);
+        setcurrentSongDuration(defaultSongs[defaultSongs.length - 1].duration);
+        setDefaultCurrentSongUpdate(true);
+        return;
+      } else {
+        setDefaultCurrentSongId(
+          `default-${defaultSongs[currentSongIndex - 1].name}`,
+        );
+        setDefaultCurrentSongUrl(defaultSongs[currentSongIndex - 1].url);
+        setcurrentSongDuration(defaultSongs[currentSongIndex - 1].duration);
+        setDefaultCurrentSongUpdate(true);
+        return;
+      }
+    }
+
+    // my songs
+    if (currentSongIndex === 0) {
+      if (roomData.room.defaultTracks) {
+        setDefaultCurrentSongId(
+          `default-${defaultSongs[defaultSongs.length - 1].name}`,
+        );
+        setDefaultCurrentSongUrl(defaultSongs[defaultSongs.length - 1].url);
+        setcurrentSongDuration(defaultSongs[defaultSongs.length - 1].duration);
+        setDefaultCurrentSongUpdate(true);
+        return;
+      }
+      setcurrentSongId(songsList[songsList.length - 1]._id);
+      setcurrentSongDuration(
+        formatTime(songsList[songsList.length - 1].duration),
+      );
+    } else {
+      setcurrentSongId(songsList[currentSongIndex - 1]._id);
+      setcurrentSongDuration(
+        formatTime(songsList[currentSongIndex - 1].duration),
+      );
+    }
+    setCurrentSongUpdate(true);
+  };
+
+  useEffect(() => {
+    playNextSongFunction();
+    setPlayNextSong(false);
+  }, [playNextSong]);
+
+  useEffect(() => {
+    playNextSongFunction();
+    setSongEnds(false);
+  }, [songEnds]);
+
+  useEffect(() => {
+    playPreviousSongFunction();
+    setPlayPreviousSong(false);
+  }, [playPreviousSong]);
 
   useEffect(() => {
     if (currentSongUpdate) {
-      if (!SongUrl || !currentSongId) return console.log("error songgg");
+      if (!SongUrl || !currentSongId) return;
+
       setCurrentPlayingSong({
         SongUrl,
         Duration: currentSongDuration,
@@ -85,8 +217,7 @@ const MusicTab = () => {
 
   useEffect(() => {
     if (defaultCurrentSongUpdate) {
-      if (!defaultCurrentSongUrl || !defaultCurrentSongId)
-        return console.log("error default songgg");
+      if (!defaultCurrentSongUrl || !defaultCurrentSongId) return;
 
       setCurrentPlayingSong({
         SongUrl: defaultCurrentSongUrl,
@@ -169,7 +300,8 @@ const MusicTab = () => {
                       setDefaultCurrentSongUpdate(true);
                     }}
                   >
-                    {`default-${song?.name}` === roomData?.room.currentSong && roomData.room.currentSongState? (
+                    {`default-${song?.name}` === roomData?.room.currentSong &&
+                    roomData.room.currentSongState ? (
                       <>
                         <AudioLines className="text-primary w-6 h-6 animate-pulse" />
                       </>
@@ -209,13 +341,6 @@ const MusicTab = () => {
 
         {/* User Songs */}
         {songsList?.map((song, index) => {
-          const minutes = Math.floor(song.duration / 60);
-          const seconds = Math.floor(song.duration % 60)
-            .toString()
-            .padStart(2, "0");
-
-          const formattedDuration = `${minutes}:${seconds}`;
-
           const displayIndex = roomData?.room.defaultTracks
             ? defaultSongs.length + index + 1
             : index + 1;
@@ -234,12 +359,13 @@ const MusicTab = () => {
                 onClick={() => {
                   if (myPlayPermission) {
                     setcurrentSongId(song._id);
-                    setcurrentSongDuration(formattedDuration);
+                    setcurrentSongDuration(formatTime(song.duration));
                     setCurrentSongUpdate(true);
                   }
                 }}
               >
-                {song._id === roomData?.room.currentSong && roomData.room.currentSongState? (
+                {song._id === roomData?.room.currentSong &&
+                roomData.room.currentSongState ? (
                   <>
                     <AudioLines className="text-primary w-6 h-6 animate-pulse" />
                   </>
@@ -269,7 +395,7 @@ const MusicTab = () => {
               </div>
 
               <div className="flex items-center gap-3 text-sm">
-                <p className="text-neutral-400">{formattedDuration}</p>
+                <p className="text-neutral-400">{formatTime(song.duration)}</p>
                 {/* Individual delete button for user songs */}
                 {myPlayPermission && (
                   <button

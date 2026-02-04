@@ -112,7 +112,6 @@ export const FlipSongPlayState = mutation({
     isPlaying: v.boolean(),
   },
   handler: async (ctx, { roomCode, currentSongTime, isPlaying }) => {
-    console.log("Current Song Time Backend : ", currentSongTime);
     const room = await ctx.db
       .query("room")
       .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))

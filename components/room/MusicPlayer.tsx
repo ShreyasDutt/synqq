@@ -16,7 +16,7 @@ import {
 } from "@/atoms/convexQueriesAtoms";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { roomCodeAtom } from "@/atoms/atoms";
+import { currentSongTimeAtom, roomCodeAtom } from "@/atoms/atoms";
 import AudioPlayer from "./AudioPlayer";
 import formatTime from "@/lib/formatSongTime";
 import { playNextSongAtom, playPreviousSongAtom } from "@/atoms/song";
@@ -32,6 +32,7 @@ const MusicPlayer = () => {
   const myPlayPermission =
     amIAdmin || roomData?.room.playbackPermissions === "everyone";
   const [currentPlayingSong] = useAtom(CurrentPlayingSong);
+  const [currentSongTime, setCurrentSongTime] = useAtom(currentSongTimeAtom);
   const setPlayNextSong = useSetAtom(playNextSongAtom);
   const setPlayPreviousSong = useSetAtom(playPreviousSongAtom);
   
@@ -105,15 +106,15 @@ const MusicPlayer = () => {
             />
           </div>
           <div className="flex items-center justify-between text-xs text-neutral-400 gap-2">
-            <p>{roomData?.room.currentSongProgress || "00:00"}</p>
+            <p>{formatTime(currentSongTime) || "00:00"}</p>
             <input
               type="range"
               min="0"
-              max="100"
+              max={currentPlayingSong?.Duration || 0}
               className={`w-full accent-foreground hover:accent-primary
             [&::-webkit-slider-thumb]:opacity-0
              ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
-              value={currentPlayingSong?.Duration || 0}
+              value={currentSongTime || 0}
               // onChange={(e) =>
 
               // }
@@ -201,7 +202,7 @@ const MusicPlayer = () => {
           />
         </div>
         <div className="flex items-center justify-between text-xs text-neutral-400 px-3 gap-2">
-          <p>{formatTime(roomData?.room.currentSongProgress)}</p>
+          <p>{formatTime(currentSongTime)}</p>
           <input
             type="range"
             min="0"
@@ -209,10 +210,10 @@ const MusicPlayer = () => {
             className={`w-full accent-foreground hover:accent-primary
             [&::-webkit-slider-thumb]:opacity-0
              ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
-            value={currentPlayingSong?.Duration || 0}
+            value={currentSongTime || 0}
             // onChange={(e) =>
 
-            // }
+            // }i
             disabled={!myPlayPermission}
           />
           <p>{currentPlayingSong?.Duration || "00:00"}</p>

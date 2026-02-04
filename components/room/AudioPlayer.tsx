@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
@@ -9,11 +9,13 @@ import {
   audioEnabledAtom,
   currentSongTimeAtom,
 } from "@/atoms/atoms";
+import { songEndsAtom } from "@/atoms/song";
 
 export default function AudioPlayer() {
   const [roomCode] = useAtom(roomCodeAtom);
   const [audioEnabled] = useAtom(audioEnabledAtom);
   const [, setCurrentSongTime] = useAtom(currentSongTimeAtom);
+  const setSongEnds = useSetAtom(songEndsAtom);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   if (!roomCode) {
@@ -28,6 +30,22 @@ export default function AudioPlayer() {
   const songUrl = roomData?.room.currentSongUrl ?? null;
   const isPlaying = roomData?.room.currentSongState === true;
   const flipSongState = useMutation(api.song.FlipSongPlayState);
+  // useEffect(() => {
+  //   const audio = audioRef.current;
+  //   if (!audio) return;
+
+  //   const updateTime = () => {
+  //     setCurrentSongTime(audio.currentTime);
+  //     flipSongState({
+  //       roomCode,
+  //       isPlaying: true,
+  //       currentSongTime: audio.currentTime,
+  //     });
+  //   };
+
+  //   audio.addEventListener("timeupdate", updateTime);
+  //   return () => audio.removeEventListener("timeupdate", updateTime);
+  // }, [setCurrentSongTime]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -50,18 +68,16 @@ export default function AudioPlayer() {
       }
     } else {
       audio.pause();
-      console.log("Paused At : " + audio.currentTime);
       setCurrentSongTime(audio.currentTime);
     }
   }, [songUrl, isPlaying, audioEnabled]);
 
-useEffect(() => {
-  if (!audioRef.current || roomData?.room.globalVolume == null) return;
+  useEffect(() => {
+    if (!audioRef.current || roomData?.room.globalVolume == null) return;
 
-  const normalizedVolume = roomData.room.globalVolume / 100;
-  audioRef.current.volume = Math.max(0, Math.min(1, normalizedVolume));
-}, [roomData?.room.globalVolume]);
-  
+    const normalizedVolume = roomData.room.globalVolume / 100;
+    audioRef.current.volume = Math.max(0, Math.min(1, normalizedVolume));
+  }, [roomData?.room.globalVolume]);
 
   const handlePlay = () => {
     const audio = audioRef.current!;
@@ -99,7 +115,7 @@ useEffect(() => {
       onPlay={handlePlay}
       onPause={handlePause}
       onSeeked={handleSeeked}
-      
+      onEnded={() => setSongEnds(true)}
     />
   );
 }
