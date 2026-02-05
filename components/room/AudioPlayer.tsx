@@ -61,7 +61,6 @@ export default function AudioPlayer() {
 
     if (isPlaying) {
       const playPromise = audio.play();
-      console.log("Current Time : " + audio.currentTime);
       setCurrentSongTime(audio.currentTime);
       audio.currentTime = roomData?.room.currentSongProgress || 0;
       if (playPromise !== undefined) {

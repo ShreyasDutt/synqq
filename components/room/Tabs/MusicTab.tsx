@@ -66,137 +66,185 @@ const MusicTab = () => {
   const setRoomPlayingSong = useMutation(api.song.setRoomSongUrl);
   const openDefaultTracksMutation = useMutation(api.song.openDefaultTracks);
 
-  const playNextSongFunction = () => {
-    const currentPlayingSong = roomData?.room.currentSong;
-    if (!currentPlayingSong || !songsList) return;
+const playNextSongFunction = () => {
+  const currentPlayingSong = roomData?.room.currentSong;
+  if (!currentPlayingSong || !songsList) return;
 
-    let currentSongIndex = songsList?.findIndex(
-      (song) => song._id === currentPlayingSong,
+  // 🚨 Default tracks enabled but not loaded yet
+  if (roomData.room.defaultTracks && defaultSongs.length === 0) return;
+
+  let currentSongIndex = songsList.findIndex(
+    (song) => song._id === currentPlayingSong,
+  );
+
+  // ================= DEFAULT TRACKS =================
+  if (currentSongIndex === -1 && roomData.room.defaultTracks) {
+    const defaultIndex = defaultSongs.findIndex(
+      (song) => `default-${song.name}` === currentPlayingSong,
     );
 
-    // default tracks
-    if (currentSongIndex === -1 && roomData.room.defaultTracks) {
-      currentSongIndex = defaultSongs?.findIndex(
-        (song) => `default-${song.name}` === currentPlayingSong,
-      );
-      if (currentSongIndex + 1 === defaultSongs.length) {
-        if (songsList.length > 0) {
-          setcurrentSongId(songsList[0]._id);
-          setcurrentSongDuration(formatTime(songsList[0].duration));
-          setCurrentSongUpdate(true);
-          return;
-        }
-        setDefaultCurrentSongId(`default-${defaultSongs[0].name}`);
-        setDefaultCurrentSongUrl(defaultSongs[0].url);
-        setcurrentSongDuration(defaultSongs[0].duration);
-        setDefaultCurrentSongUpdate(true);
-        return;
-      } else {
-        setDefaultCurrentSongId(
-          `default-${defaultSongs[currentSongIndex + 1].name}`,
-        );
-        setDefaultCurrentSongUrl(defaultSongs[currentSongIndex + 1].url);
-        setcurrentSongDuration(defaultSongs[currentSongIndex + 1].duration);
-        setDefaultCurrentSongUpdate(true);
+    if (defaultIndex === -1) return;
+
+    // --- Last default song ---
+    if (defaultIndex === defaultSongs.length - 1) {
+      if (songsList.length > 0) {
+        const firstUserSong = songsList[0];
+        if (!firstUserSong) return;
+
+        setcurrentSongId(firstUserSong._id);
+        setcurrentSongDuration(formatTime(firstUserSong.duration));
+        setCurrentSongUpdate(true);
         return;
       }
+
+      const firstDefault = defaultSongs[0];
+      if (!firstDefault) return;
+
+      setDefaultCurrentSongId(`default-${firstDefault.name}`);
+      setDefaultCurrentSongUrl(firstDefault.url);
+      setcurrentSongDuration(firstDefault.duration);
+      setDefaultCurrentSongUpdate(true);
+      return;
     }
 
-    // my songs
-    if (currentSongIndex + 1 === songsList.length) {
-      if (roomData.room.defaultTracks) {
-        setDefaultCurrentSongId(`default-${defaultSongs[0].name}`);
-        setDefaultCurrentSongUrl(defaultSongs[0].url);
-        setcurrentSongDuration(defaultSongs[0].duration);
-        setDefaultCurrentSongUpdate(true);
-        return;
-      }
-      setcurrentSongId(songsList[0]._id);
-      setcurrentSongDuration(formatTime(songsList[0].duration));
-    } else {
-      setcurrentSongId(songsList[currentSongIndex + 1]._id);
-      setcurrentSongDuration(
-        formatTime(songsList[currentSongIndex + 1].duration),
-      );
-    }
-    setCurrentSongUpdate(true);
-  };
-  const playPreviousSongFunction = () => {
-    const currentPlayingSong = roomData?.room.currentSong;
-    if (!currentPlayingSong || !songsList) return;
+    // --- Next default song ---
+    const nextDefault = defaultSongs[defaultIndex + 1];
+    if (!nextDefault) return;
 
-    let currentSongIndex = songsList?.findIndex(
-      (song) => song._id === currentPlayingSong,
+    setDefaultCurrentSongId(`default-${nextDefault.name}`);
+    setDefaultCurrentSongUrl(nextDefault.url);
+    setcurrentSongDuration(nextDefault.duration);
+    setDefaultCurrentSongUpdate(true);
+    return;
+  }
+
+  // ================= USER SONGS =================
+  if (currentSongIndex === -1) return;
+
+  if (currentSongIndex === songsList.length - 1) {
+    if (roomData.room.defaultTracks && defaultSongs.length > 0) {
+      const firstDefault = defaultSongs[0];
+      if (!firstDefault) return;
+
+      setDefaultCurrentSongId(`default-${firstDefault.name}`);
+      setDefaultCurrentSongUrl(firstDefault.url);
+      setcurrentSongDuration(firstDefault.duration);
+      setDefaultCurrentSongUpdate(true);
+      return;
+    }
+
+    const firstUserSong = songsList[0];
+    if (!firstUserSong) return;
+
+    setcurrentSongId(firstUserSong._id);
+    setcurrentSongDuration(formatTime(firstUserSong.duration));
+  } else {
+    const nextUserSong = songsList[currentSongIndex + 1];
+    if (!nextUserSong) return;
+
+    setcurrentSongId(nextUserSong._id);
+    setcurrentSongDuration(formatTime(nextUserSong.duration));
+  }
+
+  setCurrentSongUpdate(true);
+};
+
+const playPreviousSongFunction = () => {
+  const currentPlayingSong = roomData?.room.currentSong;
+  if (!currentPlayingSong || !songsList) return;
+
+  // 🚨 Default tracks enabled but not loaded yet
+  if (roomData.room.defaultTracks && defaultSongs.length === 0) return;
+
+  let currentSongIndex = songsList.findIndex(
+    (song) => song._id === currentPlayingSong,
+  );
+
+  // ================= DEFAULT TRACKS =================
+  if (currentSongIndex === -1 && roomData.room.defaultTracks) {
+    const defaultIndex = defaultSongs.findIndex(
+      (song) => `default-${song.name}` === currentPlayingSong,
     );
 
-    // default tracks
-    if (currentSongIndex === -1 && roomData.room.defaultTracks) {
-      currentSongIndex = defaultSongs?.findIndex(
-        (song) => `default-${song.name}` === currentPlayingSong,
-      );
-      if (currentSongIndex === 0) {
-        if (songsList.length > 0) {
-          setcurrentSongId(songsList[songsList.length - 1]._id);
-          setcurrentSongDuration(
-            formatTime(songsList[songsList.length - 1].duration),
-          );
-          setCurrentSongUpdate(true);
-          return;
-        }
+    // 🚨 Song not found in defaults
+    if (defaultIndex === -1) return;
 
-        setDefaultCurrentSongId(
-          `default-${defaultSongs[defaultSongs.length - 1].name}`,
-        );
-        setDefaultCurrentSongUrl(defaultSongs[defaultSongs.length - 1].url);
-        setcurrentSongDuration(defaultSongs[defaultSongs.length - 1].duration);
-        setDefaultCurrentSongUpdate(true);
-        return;
-      } else {
-        setDefaultCurrentSongId(
-          `default-${defaultSongs[currentSongIndex - 1].name}`,
-        );
-        setDefaultCurrentSongUrl(defaultSongs[currentSongIndex - 1].url);
-        setcurrentSongDuration(defaultSongs[currentSongIndex - 1].duration);
-        setDefaultCurrentSongUpdate(true);
+    // --- At first default song ---
+    if (defaultIndex === 0) {
+      if (songsList.length > 0) {
+        const lastUserSong = songsList[songsList.length - 1];
+        setcurrentSongId(lastUserSong._id);
+        setcurrentSongDuration(formatTime(lastUserSong.duration));
+        setCurrentSongUpdate(true);
         return;
       }
+
+      const lastDefault = defaultSongs[defaultSongs.length - 1];
+      if (!lastDefault) return;
+
+      setDefaultCurrentSongId(`default-${lastDefault.name}`);
+      setDefaultCurrentSongUrl(lastDefault.url);
+      setcurrentSongDuration(lastDefault.duration);
+      setDefaultCurrentSongUpdate(true);
+      return;
     }
 
-    // my songs
-    if (currentSongIndex === 0) {
-      if (roomData.room.defaultTracks) {
-        setDefaultCurrentSongId(
-          `default-${defaultSongs[defaultSongs.length - 1].name}`,
-        );
-        setDefaultCurrentSongUrl(defaultSongs[defaultSongs.length - 1].url);
-        setcurrentSongDuration(defaultSongs[defaultSongs.length - 1].duration);
-        setDefaultCurrentSongUpdate(true);
-        return;
-      }
-      setcurrentSongId(songsList[songsList.length - 1]._id);
-      setcurrentSongDuration(
-        formatTime(songsList[songsList.length - 1].duration),
-      );
-    } else {
-      setcurrentSongId(songsList[currentSongIndex - 1]._id);
-      setcurrentSongDuration(
-        formatTime(songsList[currentSongIndex - 1].duration),
-      );
+    // --- Previous default song ---
+    const prevDefault = defaultSongs[defaultIndex - 1];
+    if (!prevDefault) return;
+
+    setDefaultCurrentSongId(`default-${prevDefault.name}`);
+    setDefaultCurrentSongUrl(prevDefault.url);
+    setcurrentSongDuration(prevDefault.duration);
+    setDefaultCurrentSongUpdate(true);
+    return;
+  }
+
+  // ================= USER SONGS =================
+  if (currentSongIndex === -1) return; // 🚨 Not found anywhere
+
+  if (currentSongIndex === 0) {
+    if (roomData.room.defaultTracks && defaultSongs.length > 0) {
+      const lastDefault = defaultSongs[defaultSongs.length - 1];
+      if (!lastDefault) return;
+
+      setDefaultCurrentSongId(`default-${lastDefault.name}`);
+      setDefaultCurrentSongUrl(lastDefault.url);
+      setcurrentSongDuration(lastDefault.duration);
+      setDefaultCurrentSongUpdate(true);
+      return;
     }
-    setCurrentSongUpdate(true);
-  };
+
+    const lastUserSong = songsList[songsList.length - 1];
+    if (!lastUserSong) return;
+
+    setcurrentSongId(lastUserSong._id);
+    setcurrentSongDuration(formatTime(lastUserSong.duration));
+  } else {
+    const prevUserSong = songsList[currentSongIndex - 1];
+    if (!prevUserSong) return;
+
+    setcurrentSongId(prevUserSong._id);
+    setcurrentSongDuration(formatTime(prevUserSong.duration));
+  }
+
+  setCurrentSongUpdate(true);
+};
 
   useEffect(() => {
+    if (!playNextSong) return;
     playNextSongFunction();
     setPlayNextSong(false);
   }, [playNextSong]);
 
   useEffect(() => {
+    if (!songEnds) return;
     playNextSongFunction();
     setSongEnds(false);
   }, [songEnds]);
 
   useEffect(() => {
+    if (!playPreviousSong) return;
     playPreviousSongFunction();
     setPlayPreviousSong(false);
   }, [playPreviousSong]);
