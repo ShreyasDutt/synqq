@@ -30,22 +30,17 @@ export default function AudioPlayer() {
   const songUrl = roomData?.room.currentSongUrl ?? null;
   const isPlaying = roomData?.room.currentSongState === true;
   const flipSongState = useMutation(api.song.FlipSongPlayState);
-  // useEffect(() => {
-  //   const audio = audioRef.current;
-  //   if (!audio) return;
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-  //   const updateTime = () => {
-  //     setCurrentSongTime(audio.currentTime);
-  //     flipSongState({
-  //       roomCode,
-  //       isPlaying: true,
-  //       currentSongTime: audio.currentTime,
-  //     });
-  //   };
+    const updateTime = () => {
+      setCurrentSongTime(audio.currentTime);
+    };
 
-  //   audio.addEventListener("timeupdate", updateTime);
-  //   return () => audio.removeEventListener("timeupdate", updateTime);
-  // }, [setCurrentSongTime]);
+    audio.addEventListener("timeupdate", updateTime);
+    return () => audio.removeEventListener("timeupdate", updateTime);
+  }, [setCurrentSongTime]);
 
   useEffect(() => {
     const audio = audioRef.current;

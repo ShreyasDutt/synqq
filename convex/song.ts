@@ -156,3 +156,27 @@ export const openDefaultTracks = mutation({
     return { success: true };
   },
 });
+
+export const resetCurrentSongProgress = mutation({
+  args: { roomCode: v.number() },
+  handler: async (ctx, { roomCode }) => {
+    const room = await ctx.db.query("room").withIndex("byRoomCode", q => q.eq("roomCode", roomCode)).unique();
+    if (!room) return console.error("Room not found!!")
+    await ctx.db.patch(room?._id, {
+      currentSongProgress: 0
+    })
+    return { success: true };
+  }
+});
+
+export const updateCurrentSongProgress = mutation({
+  args: { roomCode: v.number(), currentSongProgress: v.number() },
+  handler: async (ctx, {roomCode, currentSongProgress}) => {
+    const room = await ctx.db.query("room").withIndex("byRoomCode", q => q.eq("roomCode", roomCode)).unique();
+    if(!room) return console.error("Room not found!!")
+    await ctx.db.patch(room?._id, {
+      currentSongProgress
+    })
+    return { success: true };
+  }
+})

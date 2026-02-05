@@ -32,15 +32,16 @@ const MusicPlayer = () => {
   const myPlayPermission =
     amIAdmin || roomData?.room.playbackPermissions === "everyone";
   const [currentPlayingSong] = useAtom(CurrentPlayingSong);
-  const [currentSongTime, setCurrentSongTime] = useAtom(currentSongTimeAtom);
+  const [currentSongTime ] = useAtom(currentSongTimeAtom);
   const setPlayNextSong = useSetAtom(playNextSongAtom);
   const setPlayPreviousSong = useSetAtom(playPreviousSongAtom);
   
   const changeVolume = useMutation(api.room.changeVolume);
-  const FlipSongState = useMutation(api.song.changeSongState);
+  const changeSongStateMutation = useMutation(api.song.changeSongState);
+  const updateCurrentSongProgress = useMutation(api.song.updateCurrentSongProgress);
 
   const changeSongState = () => {
-    FlipSongState({ roomCode });
+    changeSongStateMutation({ roomCode });
   };
   return (
     <div className="w-full">
@@ -115,9 +116,9 @@ const MusicPlayer = () => {
             [&::-webkit-slider-thumb]:opacity-0
              ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
               value={currentSongTime || 0}
-              // onChange={(e) =>
-
-              // }
+              onChange={(e) =>
+                updateCurrentSongProgress({roomCode, currentSongProgress: Number(e.target.value) })
+              }
               disabled={!myPlayPermission}
             />
             <p>{currentPlayingSong?.Duration}</p>
