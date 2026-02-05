@@ -9,15 +9,15 @@ import {
   audioEnabledAtom,
   currentSongTimeAtom,
 } from "@/atoms/atoms";
-import { songEndsAtom } from "@/atoms/song";
+import { songEndsAtom, songInputValueAtom } from "@/atoms/song";
 
 export default function AudioPlayer() {
   const [roomCode] = useAtom(roomCodeAtom);
   const [audioEnabled] = useAtom(audioEnabledAtom);
   const [, setCurrentSongTime] = useAtom(currentSongTimeAtom);
   const setSongEnds = useSetAtom(songEndsAtom);
+  const [songInputValue] = useAtom(songInputValueAtom);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
 
   if (!roomCode) {
     console.error("Room Code not found!!");
@@ -42,6 +42,13 @@ export default function AudioPlayer() {
     audio.addEventListener("timeupdate", updateTime);
     return () => audio.removeEventListener("timeupdate", updateTime);
   }, [setCurrentSongTime]);
+
+  // useEffect(() => {
+  //   const audio = audioRef.current!;
+  //   if (!audio) return;
+  //   audio.currentTime = songInputValue;
+
+  // }, [songInputValue]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -106,7 +113,7 @@ export default function AudioPlayer() {
     <audio
       ref={audioRef}
       preload="auto"
-      // hidden
+      hidden
       controls
       onPlay={handlePlay}
       onPause={handlePause}

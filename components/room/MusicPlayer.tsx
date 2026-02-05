@@ -19,7 +19,7 @@ import { api } from "@/convex/_generated/api";
 import { currentSongTimeAtom, roomCodeAtom } from "@/atoms/atoms";
 import AudioPlayer from "./AudioPlayer";
 import formatTime from "@/lib/formatSongTime";
-import { playNextSongAtom, playPreviousSongAtom } from "@/atoms/song";
+import { playNextSongAtom, playPreviousSongAtom, songInputValueAtom } from "@/atoms/song";
 
 const MusicPlayer = () => {
   const [roomCode] = useAtom(roomCodeAtom);
@@ -32,12 +32,12 @@ const MusicPlayer = () => {
   const myPlayPermission =
     amIAdmin || roomData?.room.playbackPermissions === "everyone";
   const [currentPlayingSong] = useAtom(CurrentPlayingSong);
-  const [currentSongTime,setcurrentSongTime ] = useAtom(currentSongTimeAtom);
+  const [currentSongTime ] = useAtom(currentSongTimeAtom);
+  const  setSongInputValue = useSetAtom(songInputValueAtom);
   const setPlayNextSong = useSetAtom(playNextSongAtom);
   const setPlayPreviousSong = useSetAtom(playPreviousSongAtom);
   
   const changeVolume = useMutation(api.room.changeVolume);
-  const updateCurrentSongProgress = useMutation(api.song.updateCurrentSongProgress);
   const changeSongStateMutation = useMutation(api.song.changeSongState);
 
   const changeSongState = () => {
@@ -116,9 +116,7 @@ const MusicPlayer = () => {
             [&::-webkit-slider-thumb]:opacity-0
              ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
               value={currentSongTime || 0}
-              onChange={(e) =>
-                setcurrentSongTime(Number(e.target.value))
-              }
+              onChange={(e) => setSongInputValue(Number(e.target.value))}
               disabled={!myPlayPermission}
             />
             <p>{currentPlayingSong?.Duration}</p>
@@ -212,9 +210,7 @@ const MusicPlayer = () => {
             [&::-webkit-slider-thumb]:opacity-0
              ${myPlayPermission && "hover:[&::-webkit-slider-thumb]:opacity-100"}`}
             value={currentSongTime || 0}
-            // onChange={(e) =>
-
-            // }i
+            onChange={(e) => setSongInputValue(Number(e.target.value))}
             disabled={!myPlayPermission}
           />
           <p>{currentPlayingSong?.Duration || "00:00"}</p>
