@@ -100,6 +100,7 @@ export const setRoomSongUrl = mutation({
       currentSong: songId,
       currentSongUrl: songUrl,
       currentSongState: true,
+      currentSongProgress: 0,
     });
     return { success: true };
   },
@@ -117,6 +118,9 @@ export const FlipSongPlayState = mutation({
       .withIndex("byRoomCode", (q) => q.eq("roomCode", roomCode))
       .unique();
     if (!room) return console.error("Room not found!!");
+
+
+
     await ctx.db.patch(room._id, {
       currentSongProgress: currentSongTime,
       updatedAt: Date.now(),
@@ -157,17 +161,6 @@ export const openDefaultTracks = mutation({
   },
 });
 
-export const resetCurrentSongProgress = mutation({
-  args: { roomCode: v.number() },
-  handler: async (ctx, { roomCode }) => {
-    const room = await ctx.db.query("room").withIndex("byRoomCode", q => q.eq("roomCode", roomCode)).unique();
-    if (!room) return console.error("Room not found!!")
-    await ctx.db.patch(room?._id, {
-      currentSongProgress: 0
-    })
-    return { success: true };
-  }
-});
 
 export const updateCurrentSongProgress = mutation({
   args: { roomCode: v.number(), currentSongProgress: v.number() },

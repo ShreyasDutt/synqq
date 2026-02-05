@@ -18,6 +18,7 @@ export default function AudioPlayer() {
   const setSongEnds = useSetAtom(songEndsAtom);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+
   if (!roomCode) {
     console.error("Room Code not found!!");
     return null;

@@ -210,7 +210,6 @@ const MusicTab = () => {
         Duration: currentSongDuration,
       });
       setRoomPlayingSong({ roomCode, songUrl: SongUrl, songId: currentSongId });
-
       setCurrentSongUpdate(false);
     }
   }, [currentSongUpdate, SongUrl, currentSongId]);
@@ -228,7 +227,6 @@ const MusicTab = () => {
         songUrl: defaultCurrentSongUrl,
         songId: defaultCurrentSongId,
       });
-
       setDefaultCurrentSongUpdate(false);
     }
   }, [defaultCurrentSongUpdate, defaultCurrentSongId, defaultCurrentSongUrl]);
