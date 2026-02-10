@@ -9,14 +9,13 @@ import {
   audioEnabledAtom,
   currentSongTimeAtom,
 } from "@/atoms/atoms";
-import { songEndsAtom, songInputValueAtom } from "@/atoms/song";
+import { songEndsAtom } from "@/atoms/song";
 
 export default function AudioPlayer() {
   const [roomCode] = useAtom(roomCodeAtom);
   const [audioEnabled] = useAtom(audioEnabledAtom);
   const [, setCurrentSongTime] = useAtom(currentSongTimeAtom);
   const setSongEnds = useSetAtom(songEndsAtom);
-  const [songInputValue] = useAtom(songInputValueAtom);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   if (!roomCode) {
@@ -59,16 +58,25 @@ export default function AudioPlayer() {
       audio.load();
     }
 
-    if (isPlaying) {
-      const playPromise = audio.play();
-      setCurrentSongTime(audio.currentTime);
-      audio.currentTime = roomData?.room.currentSongProgress || 0;
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          console.log("Autoplay blocked");
-        });
-      }
-    } else {
+if (isPlaying) {
+  let starttime = roomData?.room.currentSongProgress || 0;
+
+  if (roomData.room.updatedAt) {
+    const elapsed = (Date.now() - roomData.room.updatedAt) / 1000;
+    starttime += elapsed;
+  }
+
+  audio.currentTime = starttime;
+  setCurrentSongTime(starttime);
+
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      console.log("Autoplay blocked");
+    });
+  }
+}
+ else {
       audio.pause();
       setCurrentSongTime(audio.currentTime);
     }
